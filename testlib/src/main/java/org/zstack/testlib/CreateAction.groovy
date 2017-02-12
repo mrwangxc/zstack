@@ -9,12 +9,8 @@ trait CreateAction {
     // return uuid of the created resource
     abstract String create(String sessionUuid)
 
-    Object result(Object ret) {
-        def m = ret as Map
-        if (m.error != null) {
-            throw new TestException("API failure: ${JSONObjectUtil.toJsonString(m.error)}")
-        }
-
-        return m.value.inventory
+    def errorOut(res) {
+        assert res.error == null : "API failure: ${JSONObjectUtil.toJsonString(res.error)}"
+        return res.value.inventory
     }
 }

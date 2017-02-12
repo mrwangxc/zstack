@@ -11,8 +11,12 @@ import org.zstack.core.Platform
 import org.zstack.core.componentloader.ComponentLoader
 import org.zstack.kvm.KVMGlobalProperty
 import org.zstack.network.service.virtualrouter.VirtualRouterGlobalProperty
+import org.zstack.sdk.ZSClient
+import org.zstack.sdk.ZSConfig
 import org.zstack.storage.backup.sftp.SftpBackupStorageGlobalProperty
 import org.zstack.utils.Utils
+
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by xing5 on 2017/2/12.
@@ -22,7 +26,8 @@ class WebBeanConstructor extends BeanConstructor {
     private static final String BASE_DIR = "target/test-classes/tomcat"
     private static final String APP_NAME = "zstack"
 
-    int port = 8989
+    static int port = 8989
+    static String WEB_HOOK_PATH = "http://127.0.0.1:$port/sdk/webook"
 
     WebBeanConstructor() {
         // initialize static block in Platform
@@ -36,7 +41,7 @@ class WebBeanConstructor extends BeanConstructor {
     private void generateWarFile() {
         WebArchive war = ShrinkWrap.create(WebArchive.class, "zstack.war")
         war.setWebXML(new File("src/test/resources/webapp/WEB-INF/web.xml"))
-        war.addAsWebInfResource(new File("src/test/resources/webapp/WEB-INF/zstack-servlet-context.xml"), "classes/zstack-servlet-context.xml")
+        war.addAsWebInfResource(new File("src/test/resources/webapp/WEB-INF/zstack-servlet-context-groovy.xml"), "classes/zstack-servlet-context.xml")
         new ZipExporterImpl(war).exportTo(new File(Utils.getPathUtil().join(BASE_DIR, war.getName())), true)
     }
 
@@ -59,8 +64,23 @@ class WebBeanConstructor extends BeanConstructor {
         jetty.setHandler(webapp)
     }
 
+    private void configureSDK() {
+        ZSClient.configure(
+                new ZSConfig.Builder()
+                        .setHostname("127.0.0.1")
+                        .setPort(port)
+                        .setWebHook(WEB_HOOK_PATH)
+                        .setDefaultPollingInterval(100, TimeUnit.MILLISECONDS)
+                        .setDefaultPollingTimeout(15, TimeUnit.SECONDS)
+                        .setReadTimeout(10, TimeUnit.MINUTES)
+                        .setWriteTimeout(10, TimeUnit.MINUTES)
+                        .build()
+        )
+    }
+
     @Override
     ComponentLoader build() {
+        configureSDK()
         generateSpringConfig()
         startWebServer()
         return Platform.getComponentLoader()

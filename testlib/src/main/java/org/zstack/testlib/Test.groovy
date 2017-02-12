@@ -19,10 +19,11 @@ abstract class Test {
     private Deployer deployer = new Deployer()
     private int phase = PHASE_NONE
 
-    protected void env(@DelegatesTo(strategy=Closure.DELEGATE_ONLY, value=EnvSpec.class) Closure c) {
+    protected EnvSpec env(@DelegatesTo(strategy=Closure.DELEGATE_ONLY, value=EnvSpec.class) Closure c) {
         def code = c.rehydrate(deployer.envSpec, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
+        return deployer.envSpec
     }
 
     protected void spring(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = Deployer.SpringSpec.class) Closure c) {
@@ -41,6 +42,7 @@ abstract class Test {
 
     protected boolean DEPLOY_DB = true
     protected boolean NEED_WEB_SERVER = true
+    protected boolean API_PORTAL = true
 
     private void deployDB() {
         logger.info("Deploying database ...")
@@ -86,6 +88,14 @@ abstract class Test {
 
     private void prepare() {
         nextPhase()
+        if (API_PORTAL) {
+            spring {
+                include("ManagementNodeManager.xml")
+                include("ApiMediator.xml")
+                include("AccountManager.xml")
+            }
+        }
+
         setup()
 
         if (DEPLOY_DB) {
@@ -105,9 +115,13 @@ abstract class Test {
 
     @org.junit.Test
     final void doTest() {
-        prepare()
-
-        nextPhase()
-        test()
+        try {
+            prepare()
+            nextPhase()
+            test()
+        } catch (Throwable t) {
+            logger.warn(t.message, t)
+            System.exit(1)
+        }
     }
 }

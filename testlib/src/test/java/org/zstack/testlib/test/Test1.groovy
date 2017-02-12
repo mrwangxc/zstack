@@ -9,7 +9,7 @@ import org.zstack.testlib.Test
 class Test1 extends Test {
     void setup() {
         spring {
-            use("kvm.xml")
+            include("kvm.xml")
         }
     }
 
@@ -32,6 +32,5 @@ class Test1 extends Test {
     }
 
     void test() {
-        def bus = bean(CloudBus.class)
     }
 }

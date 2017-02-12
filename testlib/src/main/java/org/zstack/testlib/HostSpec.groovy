@@ -1,5 +1,6 @@
 package org.zstack.testlib
 
+import org.zstack.sdk.HostInventory
 import org.zstack.utils.data.SizeUnit
 
 /**
@@ -13,6 +14,8 @@ abstract class HostSpec implements Node, CreateAction, Tag {
     Long usedMem = 0
     Integer totalCpu = 32
     Integer usedCpu = 0
+
+    HostInventory inventory
 
     HostSpec() {
     }

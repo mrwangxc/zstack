@@ -2,8 +2,8 @@ package org.zstack.testlib
 
 import org.zstack.kvm.KVMAgentCommands
 import org.zstack.kvm.KVMConstant
-import org.zstack.kvm.KVMHostInventory
 import org.zstack.sdk.AddKVMHostAction
+import org.zstack.sdk.HostInventory
 
 /**
  * Created by xing5 on 2017/2/12.
@@ -11,8 +11,6 @@ import org.zstack.sdk.AddKVMHostAction
 class KVMHostSpec extends HostSpec {
     String username
     String password
-
-    KVMHostInventory inventory
 
     KVMHostSpec() {
         super()
@@ -30,7 +28,7 @@ class KVMHostSpec extends HostSpec {
         a.clusterUuid = (parent as ClusterSpec).inventory.uuid
         a.sessionId = sessionUuid
 
-        inventory = result(a.call()) as KVMHostInventory
+        inventory = errorOut(a.call()) as HostInventory
 
         return inventory.uuid
     }

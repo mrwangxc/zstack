@@ -1,7 +1,7 @@
 package org.zstack.testlib
 
-import org.zstack.header.zone.ZoneInventory
 import org.zstack.sdk.CreateZoneAction
+import org.zstack.sdk.ZoneInventory
 
 /**
  * Created by xing5 on 2017/2/12.
@@ -45,7 +45,7 @@ class ZoneSpec implements Node, CreateAction, Tag {
         a.sessionId = sessionUuid
         a.userTags = userTags
         a.systemTags = systemTags
-        inventory = result(a.call()) as ZoneInventory
+        inventory = errorOut(a.call()) as ZoneInventory
 
         return inventory.uuid
     }

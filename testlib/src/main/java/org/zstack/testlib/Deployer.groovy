@@ -7,6 +7,7 @@ import org.zstack.core.CoreGlobalProperty
 import org.zstack.core.componentloader.ComponentLoader
 import org.zstack.header.Constants
 import org.zstack.header.rest.RESTConstant
+import org.zstack.sdk.ZSClient
 import org.zstack.utils.gson.JSONObjectUtil
 
 import javax.servlet.http.HttpServletRequest
@@ -21,11 +22,11 @@ class Deployer {
         private List<String> xmls = []
         private boolean all
 
-        void use(String xml) {
+        void include(String xml) {
             xmls.add(xml)
         }
 
-        void useAll() {
+        void includeAll() {
             all = true
         }
     }
@@ -88,9 +89,14 @@ class Deployer {
 
     static void handleSimulatorHttpRequests(HttpServletRequest req, HttpServletResponse rsp) {
         def url = req.getRequestURI()
+        if (WebBeanConstructor.WEB_HOOK_PATH.toString().contains(url)) {
+            ZSClient.webHookCallback(req, rsp)
+            return
+        }
+
         def handler = httpHandlers[url]
         if (handler == null) {
-            rsp.sendError(HttpStatus.NOT_FOUND.value(), "cannot find simulator handler for ${req.getRequestURI()}")
+            rsp.sendError(HttpStatus.NOT_FOUND.value(), "not handler found for the path $url")
             return
         }
 

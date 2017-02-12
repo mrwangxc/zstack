@@ -1,6 +1,6 @@
 package org.zstack.testlib
 
-import org.zstack.header.cluster.ClusterInventory
+import org.zstack.sdk.ClusterInventory
 import org.zstack.sdk.CreateClusterAction
 
 /**
@@ -46,7 +46,7 @@ class ClusterSpec implements Node, CreateAction, Tag {
         a.userTags = userTags
         a.systemTags = systemTags
 
-        inventory = result(a.call()) as ClusterInventory
+        inventory = errorOut(a.call()) as ClusterInventory
 
         return inventory.uuid
     }

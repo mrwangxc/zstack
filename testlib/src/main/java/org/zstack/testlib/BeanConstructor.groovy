@@ -52,19 +52,21 @@ class BeanConstructor {
 
     protected void generateSpringConfig() {
         try {
+            //URL templatePath = this.getClass().getClassLoader().getResource("zstack-template.xml")
             URL templatePath = this.getClass().getClassLoader().getResource("zstack-template.xml")
             File template = new File(templatePath.getPath())
             List<String> contents = template.readLines()
 
+            int insertPos = contents.size() - 1
             springConfigPath = "target/test-classes/" + SPRING_XML_NAME
             if (loadAll) {
-                contents.add("""\t<import resource="zstack.xml" />""")
+                contents.add(insertPos, """\t<import resource="zstack.xml" />""")
             } else {
-                def allXmls = coreBeans + xmls
-                allXmls = allXmls.collect {
+                (coreBeans + xmls).collect {
                     """\t<import resource="springConfigXml/$it" />"""
+                }.each {
+                    contents.add(insertPos, it)
                 }
-                contents += allXmls
             }
 
             File tmpSpringConfig = new File(springConfigPath)
