@@ -26,6 +26,11 @@
             <artifactId>mockito-core</artifactId>
             <version>1.10.19</version>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.zstack</groupId>
@@ -110,6 +115,11 @@
         <dependency>
             <groupId>org.zstack</groupId>
             <artifactId>fusionstor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.zstack</groupId>
+            <artifactId>sdk</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

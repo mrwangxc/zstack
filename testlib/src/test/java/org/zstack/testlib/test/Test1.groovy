@@ -15,7 +15,7 @@ class Test1 extends Test {
                 cluster {
                     name = "cluster1"
 
-                    host {
+                    kvm {
                         name = "host1"
                         managementIp = "localhost"
                     }
