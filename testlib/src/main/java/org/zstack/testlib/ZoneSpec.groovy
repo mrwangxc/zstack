@@ -1,5 +1,6 @@
 package org.zstack.testlib
 
+import org.zstack.sdk.AttachPrimaryStorageToClusterAction
 import org.zstack.sdk.CreateZoneAction
 import org.zstack.sdk.ZoneInventory
 
@@ -9,9 +10,10 @@ import org.zstack.sdk.ZoneInventory
 class ZoneSpec implements Node, CreateAction, Tag {
     String name
     String description
-    private List<ClusterSpec> clusters = []
+    List<ClusterSpec> clusters = []
+    List<PrimaryStorageSpec> primaryStorage = []
 
-    private ZoneInventory inventory
+    ZoneInventory inventory
 
     ZoneSpec(String name, String description) {
         this.name = name
@@ -31,8 +33,26 @@ class ZoneSpec implements Node, CreateAction, Tag {
         return cspec
     }
 
-    void accept(NodeVisitor v) {
-        v.visit(this)
+    PrimaryStorageSpec nfsPrimaryStorageSpec(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = PrimaryStorageSpec.class) Closure c) {
+        def nspec = new NfsPrimaryStorageSpec()
+        def code = c.rehydrate(nspec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code()
+        addChild(nspec)
+        primaryStorage.add(nspec)
+        return nspec
+    }
+
+    void attachPrimaryStorageToCluster(String primaryStorageName, String clusterName) {
+        def ps = primaryStorage.find { it.name == primaryStorageName }
+        assert ps != null : "primary storage[$primaryStorageName] not found, check your environment()"
+        def cluster = clusters.find { it.name == clusterName }
+        assert cluster != null : "cluster[$clusterName] not found, check your environment()"
+
+        def a = new AttachPrimaryStorageToClusterAction()
+        a.clusterUuid = cluster.inventory.uuid
+        a.primaryStorageUuid = ps.inventory.uuid
+        errorOut(a.call())
     }
 
     SpecID create(String sessionUuid) {

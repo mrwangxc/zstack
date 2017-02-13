@@ -19,8 +19,4 @@ abstract class HostSpec implements Node, CreateAction, Tag {
 
     HostSpec() {
     }
-
-    void accept(NodeVisitor v) {
-        v.visit(this)
-    }
 }

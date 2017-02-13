@@ -44,5 +44,16 @@ class KVMHostSpec extends HostSpec {
             rsp.cpuSpeed = 1
             return rsp
         }
+
+        Deployer.simulator(KVMConstant.KVM_HARDEN_CONSOLE_PATH) {
+            return new KVMAgentCommands.AgentResponse()
+        }
+
+        Deployer.simulator(KVMConstant.KVM_DELETE_CONSOLE_FIREWALL_PATH) {
+            return new KVMAgentCommands.AgentResponse()
+        }
+
+        Deployer.simulator(KVMConstant.KVM_VM_CHECK_STATE) {
+        }
     }
 }

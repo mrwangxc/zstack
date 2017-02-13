@@ -26,6 +26,7 @@ class Test1 extends Test {
 
                 cluster {
                     name = "cluster"
+                    hypervisorType = "KVM"
 
                     kvm {
                         name = "kvm"
@@ -34,6 +35,13 @@ class Test1 extends Test {
                         totalCpu = 10
                     }
                 }
+
+                nfsPrimaryStorageSpec {
+                    name = "nfs"
+                    url = "localhost:/nfs"
+                }
+
+                attachPrimaryStorageToCluster("nfs", "cluster")
             }
         }.deploy()
     }

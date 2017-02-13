@@ -8,7 +8,9 @@ trait Node {
     List<Node> children = []
     List<Node> friends = []
 
-    abstract void accept(NodeVisitor v)
+    void accept(NodeVisitor v) {
+        v.visit(this)
+    }
 
     void addChild(Node child) {
         child.parent = this

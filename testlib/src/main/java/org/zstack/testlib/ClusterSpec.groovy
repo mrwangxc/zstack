@@ -10,7 +10,8 @@ class ClusterSpec implements Node, CreateAction, Tag {
     String name
     String description
     String hypervisorType
-    private List<HostSpec> hosts = []
+    List<HostSpec> hosts = []
+    Map<String, PrimaryStorageSpec> primaryStorage = [:]
 
     ClusterInventory inventory
 
@@ -31,10 +32,6 @@ class ClusterSpec implements Node, CreateAction, Tag {
         addChild(hspec)
         hosts.add(hspec)
         return hspec
-    }
-
-    void accept(NodeVisitor v) {
-        v.visit(this)
     }
 
     SpecID create(String sessionUuid) {
