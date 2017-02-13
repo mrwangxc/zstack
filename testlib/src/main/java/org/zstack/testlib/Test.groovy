@@ -1,5 +1,6 @@
 package org.zstack.testlib
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.zstack.header.exception.CloudRuntimeException
 import org.zstack.utils.ShellUtils
 import org.zstack.utils.Utils
@@ -16,7 +17,8 @@ abstract class Test {
     private final int PHASE_ENV = 2
     private final int PHASE_TEST = 3
 
-    private Deployer deployer = new Deployer()
+    static Deployer deployer = new Deployer()
+
     private int phase = PHASE_NONE
 
     protected EnvSpec env(@DelegatesTo(strategy=Closure.DELEGATE_ONLY, value=EnvSpec.class) Closure c) {
@@ -43,6 +45,7 @@ abstract class Test {
     protected boolean DEPLOY_DB = true
     protected boolean NEED_WEB_SERVER = true
     protected boolean API_PORTAL = true
+    protected boolean DOC = ""
 
     private void deployDB() {
         logger.info("Deploying database ...")
@@ -111,6 +114,14 @@ abstract class Test {
     protected <T> T bean(Class<T> clz) {
         assert phase > PHASE_SETUP : "getBean() can only be called in method environment() or test()"
         return deployer.componentLoader.getComponent(clz)
+    }
+
+    protected <T> T specByName(String name) {
+        return deployer.envSpec.specByName(name) as T
+    }
+
+    protected <T> T specByUuid(String uuid) {
+        return deployer.envSpec.specByUuid(uuid) as T
     }
 
     @org.junit.Test

@@ -23,20 +23,21 @@ class ClusterSpec implements Node, CreateAction, Tag {
         this.hypervisorType = hypervisorType
     }
 
-    void kvm(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = HostSpec.class) Closure c) {
+    KVMHostSpec kvm(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = HostSpec.class) Closure c) {
         def hspec = new KVMHostSpec()
         def code = c.rehydrate(hspec, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
-        hosts.add(hspec)
         addChild(hspec)
+        hosts.add(hspec)
+        return hspec
     }
 
     void accept(NodeVisitor v) {
         v.visit(this)
     }
 
-    String create(String sessionUuid) {
+    SpecID create(String sessionUuid) {
         def a = new CreateClusterAction()
         a.name = name
         a.description = description
@@ -48,6 +49,6 @@ class ClusterSpec implements Node, CreateAction, Tag {
 
         inventory = errorOut(a.call()) as ClusterInventory
 
-        return inventory.uuid
+        return id(name, inventory.uuid)
     }
 }

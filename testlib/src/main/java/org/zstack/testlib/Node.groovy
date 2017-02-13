@@ -20,10 +20,12 @@ trait Node {
         friend.friends.add(this)
     }
 
-    private void walkNode(Node n, Closure c) {
+    void walkNode(Node n, Closure c) {
         c(n)
 
-        n.children.each { walkNode(it, c) }
+        n.children.each {
+            walkNode(it, c)
+        }
     }
 
     void walk(Closure c) {

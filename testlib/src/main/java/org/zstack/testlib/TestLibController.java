@@ -22,6 +22,6 @@ public class TestLibController {
             }
     )
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Deployer.handleSimulatorHttpRequests(request, response);
+        Test.getDeployer().handleSimulatorHttpRequests(request, response);
     }
 }

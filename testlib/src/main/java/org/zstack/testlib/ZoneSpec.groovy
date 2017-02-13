@@ -21,24 +21,21 @@ class ZoneSpec implements Node, CreateAction, Tag {
     ZoneSpec() {
     }
 
-    void cluster(String name, String description, String hypervisorType) {
-        clusters.add(new ClusterSpec(name, description, hypervisorType))
-    }
-
-    void cluster(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ClusterSpec.class) Closure c) {
+    ClusterSpec cluster(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ClusterSpec.class) Closure c) {
         def cspec = new ClusterSpec()
         def code = c.rehydrate(cspec, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
-        clusters.add(cspec)
         addChild(cspec)
+        clusters.add(cspec)
+        return cspec
     }
 
     void accept(NodeVisitor v) {
         v.visit(this)
     }
 
-    String create(String sessionUuid) {
+    SpecID create(String sessionUuid) {
         def a = new CreateZoneAction()
         a.name = name
         a.description = description
@@ -47,6 +44,6 @@ class ZoneSpec implements Node, CreateAction, Tag {
         a.systemTags = systemTags
         inventory = errorOut(a.call()) as ZoneInventory
 
-        return inventory.uuid
+        return id(name, inventory.uuid)
     }
 }

@@ -16,7 +16,7 @@ class KVMHostSpec extends HostSpec {
         super()
     }
 
-    String create(String sessionUuid) {
+    SpecID create(String sessionUuid) {
         def a = new AddKVMHostAction()
         a.name = name
         a.description = description
@@ -30,7 +30,7 @@ class KVMHostSpec extends HostSpec {
 
         inventory = errorOut(a.call()) as HostInventory
 
-        return inventory.uuid
+        return id(name, inventory.uuid)
     }
 
     static {

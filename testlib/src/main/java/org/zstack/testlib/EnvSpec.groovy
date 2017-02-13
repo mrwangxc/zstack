@@ -1,8 +1,8 @@
 package org.zstack.testlib
 
 import org.zstack.header.identity.AccountConstant
-import org.zstack.header.identity.SessionInventory
 import org.zstack.sdk.LogInByAccountAction
+import org.zstack.sdk.SessionInventory
 import org.zstack.utils.gson.JSONObjectUtil
 
 /**
@@ -11,18 +11,22 @@ import org.zstack.utils.gson.JSONObjectUtil
 class EnvSpec {
     private List<ZoneSpec> zones = []
 
-    org.zstack.sdk.SessionInventory adminSession
+    SessionInventory adminSession
+
+    private Map specsByName = [:]
+    private Map specsByUuid = [:]
 
     void zone(String name, String description) {
         zones.add(new ZoneSpec(name, description))
     }
 
-    void zone(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ZoneSpec.class) Closure c)  {
+    ZoneSpec zone(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ZoneSpec.class) Closure c)  {
         def zspec = new ZoneSpec()
         def code = c.rehydrate(zspec, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
         zones.add(zspec)
+        return zspec
     }
 
     void adminLogin() {
@@ -34,11 +38,24 @@ class EnvSpec {
         adminSession = res.value.inventory
     }
 
+    def specByUuid(String uuid) {
+        return specsByUuid[uuid]
+    }
+
+    def specByName(String name) {
+        return specsByName[name]
+    }
+
     void deploy() {
         adminLogin()
 
         zones.each { node ->
-            node.walk { (it as CreateAction).create(adminSession.uuid) }
+            node.walk {
+                println("xxxxxxxxxxxxxxxxxxxxxxxxxxx $it")
+                SpecID id = (it as CreateAction).create(adminSession.uuid)
+                specsByName[id.name] = it
+                specsByUuid[id.uuid] = it
+            }
         }
     }
 }

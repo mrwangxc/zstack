@@ -7,10 +7,14 @@ import org.zstack.utils.gson.JSONObjectUtil
  */
 trait CreateAction {
     // return uuid of the created resource
-    abstract String create(String sessionUuid)
+    abstract SpecID create(String sessionUuid)
 
     def errorOut(res) {
         assert res.error == null : "API failure: ${JSONObjectUtil.toJsonString(res.error)}"
         return res.value.inventory
+    }
+
+    SpecID id(String name, String uuid) {
+        return new SpecID(name, uuid)
     }
 }

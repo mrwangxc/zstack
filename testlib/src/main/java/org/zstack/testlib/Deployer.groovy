@@ -1,7 +1,10 @@
 package org.zstack.testlib
 
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.*
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.stereotype.Controller
 import org.springframework.web.client.RestTemplate
 import org.zstack.core.CoreGlobalProperty
 import org.zstack.core.componentloader.ComponentLoader
@@ -36,7 +39,6 @@ class Deployer {
 
     private static Map<String, Closure> httpHandlers = [:]
     private static RestTemplate restTemplate
-    private static Map<String, Object> resources = [:]
     private BeanConstructor beanConstructor
     ComponentLoader componentLoader
 
@@ -87,7 +89,7 @@ class Deployer {
         httpHandlers[path] = c
     }
 
-    static void handleSimulatorHttpRequests(HttpServletRequest req, HttpServletResponse rsp) {
+    void handleSimulatorHttpRequests(HttpServletRequest req, HttpServletResponse rsp) {
         def url = req.getRequestURI()
         if (WebBeanConstructor.WEB_HOOK_PATH.toString().contains(url)) {
             ZSClient.webHookCallback(req, rsp)
@@ -115,7 +117,7 @@ class Deployer {
 
         String resourceUuid = header.getFirst(Constants.AGENT_HTTP_HEADER_RESOURCE_UUID)
         if (resourceUuid != null) {
-            def spec = resources[resourceUuid]
+            def spec = envSpec.specByUuid(resourceUuid)
             if (spec != null) {
                 handler = handler.rehydrate(spec, this, this)
             }
