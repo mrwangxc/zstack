@@ -23,20 +23,20 @@ class ZoneSpec implements Node, CreateAction, Tag, CreationSpec {
     ZoneSpec() {
     }
 
-    ClusterSpec cluster(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ClusterSpec.class) Closure c) {
+    ClusterSpec cluster(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ClusterSpec.class) Closure c) {
         def cspec = new ClusterSpec()
         def code = c.rehydrate(cspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
         addChild(cspec)
         clusters.add(cspec)
         return cspec
     }
 
-    PrimaryStorageSpec nfsPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = PrimaryStorageSpec.class) Closure c) {
+    PrimaryStorageSpec nfsPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = PrimaryStorageSpec.class) Closure c) {
         def nspec = new NfsPrimaryStorageSpec()
         def code = c.rehydrate(nspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
         addChild(nspec)
         primaryStorage.add(nspec)
@@ -60,14 +60,15 @@ class ZoneSpec implements Node, CreateAction, Tag, CreationSpec {
         addChild(an)
     }
 
-    SpecID create(String sessionUuid) {
-        def a = new CreateZoneAction()
-        a.name = name
-        a.description = description
-        a.sessionId = sessionUuid
-        a.userTags = userTags
-        a.systemTags = systemTags
-        inventory = errorOut(a.call()) as ZoneInventory
+    SpecID create(String uuid, String sessionUuid) {
+        inventory = createZone {
+            delegate.resourceUuid = uuid
+            delegate.name = name
+            delegate.sessionId = sessionUuid
+            delegate.description = description
+            delegate.userTags = userTags
+            delegate.systemTags = systemTags
+        } as ZoneInventory
 
         return id(name, inventory.uuid)
     }

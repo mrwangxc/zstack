@@ -2,6 +2,7 @@ package org.zstack.testlib
 
 import org.springframework.http.HttpEntity
 import org.zstack.core.db.Q
+import org.zstack.header.Constants
 import org.zstack.header.vm.VmInstanceState
 import org.zstack.header.vm.VmInstanceVO
 import org.zstack.header.vm.VmInstanceVO_
@@ -24,31 +25,31 @@ class KVMHostSpec extends HostSpec {
         super()
     }
 
-    SpecID create(String sessionUuid) {
-        def a = new AddKVMHostAction()
-        a.name = name
-        a.description = description
-        a.managementIp = managementIp
-        a.username = username
-        a.password = password
-        a.userTags = userTags
-        a.systemTags = systemTags
-        a.clusterUuid = (parent as ClusterSpec).inventory.uuid
-        a.sessionId = sessionUuid
-
-        inventory = errorOut(a.call()) as HostInventory
+    SpecID create(String uuid, String sessionUuid) {
+        inventory = addKVMHost {
+            delegate.resourceUuid = uuid
+            delegate.name = name
+            delegate.description = description
+            delegate.managementIp = managementIp
+            delegate.username = username
+            delegate.password = password
+            delegate.userTags = userTags
+            delegate.systemTags = systemTags
+            delegate.clusterUuid = (parent as ClusterSpec).inventory.uuid
+            delegate.sessionId = sessionUuid
+        } as HostInventory
 
         return id(name, inventory.uuid)
     }
 
     static {
-        Deployer.simulator(KVMConstant.KVM_HOST_FACT_PATH) {
+        Deployer.simulator(KVMConstant.KVM_HOST_CAPACITY_PATH) {
             def rsp = new KVMAgentCommands.HostCapacityResponse()
             rsp.success = true
-            rsp.usedCpu = usedCpu
-            rsp.cpuNum = totalCpu
-            rsp.totalMemory = totalMem
-            rsp.usedMemory = usedMem
+            rsp.usedCpu = spec.usedCpu
+            rsp.cpuNum = spec.totalCpu
+            rsp.totalMemory = spec.totalMem
+            rsp.usedMemory = spec.usedMem
             rsp.cpuSpeed = 1
             return rsp
         }
@@ -126,10 +127,13 @@ class KVMHostSpec extends HostSpec {
             return new KVMAgentCommands.DetachDataVolumeResponse()
         }
 
-        Deployer.simulator(KVMConstant.KVM_VM_SYNC_PATH) {
+        Deployer.simulator(KVMConstant.KVM_VM_SYNC_PATH) { HttpEntity<String> e ->
+            def hostUuid = spec?.inventory?.uuid
+            hostUuid = hostUuid == null ? e.getHeaders().getFirst(Constants.AGENT_HTTP_HEADER_RESOURCE_UUID) : hostUuid
+
             List<Tuple> states = Q.New(VmInstanceVO.class)
                     .select(VmInstanceVO_.uuid, VmInstanceVO_.state).eq(VmInstanceVO_.state, VmInstanceState.Running)
-                    .eq(VmInstanceVO_.hostUuid, inventory.uuid).listTuple()
+                    .eq(VmInstanceVO_.hostUuid, hostUuid).listTuple()
 
             def rsp = new KVMAgentCommands.VmSyncResponse()
             rsp.states = states.collectEntries {

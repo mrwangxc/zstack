@@ -6,7 +6,7 @@ import org.zstack.sdk.CreateClusterAction
 /**
  * Created by xing5 on 2017/2/12.
  */
-class ClusterSpec implements Node, CreateAction, Tag {
+class ClusterSpec implements Node, CreateAction, Tag, CreationSpec {
     String name
     String description
     String hypervisorType
@@ -24,27 +24,27 @@ class ClusterSpec implements Node, CreateAction, Tag {
         this.hypervisorType = hypervisorType
     }
 
-    KVMHostSpec kvm(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = HostSpec.class) Closure c) {
+    KVMHostSpec kvm(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = KVMHostSpec.class) Closure c) {
         def hspec = new KVMHostSpec()
         def code = c.rehydrate(hspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
         addChild(hspec)
         hosts.add(hspec)
         return hspec
     }
 
-    SpecID create(String sessionUuid) {
-        def a = new CreateClusterAction()
-        a.name = name
-        a.description = description
-        a.hypervisorType = hypervisorType
-        a.zoneUuid = (parent as ZoneSpec).inventory.uuid
-        a.sessionId = sessionUuid
-        a.userTags = userTags
-        a.systemTags = systemTags
-
-        inventory = errorOut(a.call()) as ClusterInventory
+    SpecID create(String uuid, String sessionUuid) {
+        inventory = createCluster {
+            delegate.resourceUuid = uuid
+            delegate.name = name
+            delegate.description = description
+            delegate.hypervisorType = hypervisorType
+            delegate.zoneUuid = (parent as ZoneSpec).inventory.uuid
+            delegate.sessionId = sessionUuid
+            delegate.userTags = userTags
+            delegate.systemTags = systemTags
+        } as ClusterInventory
 
         return id(name, inventory.uuid)
     }

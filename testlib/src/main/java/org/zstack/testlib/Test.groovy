@@ -20,16 +20,16 @@ abstract class Test implements CreationSpec {
 
     private int phase = PHASE_NONE
 
-    protected EnvSpec env(@DelegatesTo(strategy=Closure.DELEGATE_ONLY, value=EnvSpec.class) Closure c) {
+    protected EnvSpec env(@DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=EnvSpec.class) Closure c) {
         def code = c.rehydrate(deployer.envSpec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
         return deployer.envSpec
     }
 
-    protected void spring(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SpringSpec.class) Closure c) {
+    protected void spring(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SpringSpec.class) Closure c) {
         def code = c.rehydrate(deployer.springSpec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
     }
 

@@ -27,14 +27,14 @@ class Test1 extends Test {
                     name = "cluster"
                     hypervisorType = "KVM"
 
-                    /*
                     kvm {
                         name = "kvm"
                         managementIp = "localhost"
+                        username = "root"
+                        password = "password"
                         usedMem = 1000
                         totalCpu = 10
                     }
-                    */
                 }
 
                 nfsPrimaryStorage {
@@ -49,10 +49,5 @@ class Test1 extends Test {
 
     @Override
     void test() {
-        def inv = zone {
-            name = "zone2"
-        }
-
-        println("hello world ${inv.name}")
     }
 }

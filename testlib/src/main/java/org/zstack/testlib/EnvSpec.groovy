@@ -20,10 +20,10 @@ class EnvSpec {
         zones.add(new ZoneSpec(name, description))
     }
 
-    ZoneSpec zone(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = ZoneSpec.class) Closure c)  {
+    ZoneSpec zone(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ZoneSpec.class) Closure c)  {
         def zspec = new ZoneSpec()
         def code = c.rehydrate(zspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_ONLY
+        code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
         zones.add(zspec)
         return zspec

@@ -1,5 +1,7 @@
 package org.zstack.testlib
 
+import org.zstack.core.Platform
+
 /**
  * Created by xing5 on 2017/2/12.
  */
@@ -49,9 +51,10 @@ trait Node {
                 " in environment() of the test case"
 
         walk {
-            SpecID id = (it as CreateAction).create(sessionUuid)
+            def uuid = Platform.getUuid()
+            Test.deployer.envSpec.specsByUuid[uuid] = it
+            SpecID id = (it as CreateAction).create(uuid, sessionUuid)
             Test.deployer.envSpec.specsByName[id.name] = it
-            Test.deployer.envSpec.specsByUuid[id.uuid] = it
         }
     }
 }

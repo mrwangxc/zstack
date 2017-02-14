@@ -6,7 +6,7 @@ import org.zstack.utils.data.SizeUnit
 /**
  * Created by xing5 on 2017/2/13.
  */
-abstract class PrimaryStorageSpec implements Node, CreateAction, Tag {
+abstract class PrimaryStorageSpec implements Node, CreateAction, Tag, CreationSpec {
     String name
     String description
     String url

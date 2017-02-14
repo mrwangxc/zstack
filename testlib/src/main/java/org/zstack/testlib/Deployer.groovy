@@ -8,7 +8,9 @@ import org.zstack.core.componentloader.ComponentLoader
 import org.zstack.header.Constants
 import org.zstack.header.rest.RESTConstant
 import org.zstack.sdk.ZSClient
+import org.zstack.utils.Utils
 import org.zstack.utils.gson.JSONObjectUtil
+import org.zstack.utils.logging.CLogger
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -18,6 +20,8 @@ import javax.servlet.http.HttpServletResponse
  */
 
 class Deployer {
+    static final CLogger logger = Utils.getLogger(Deployer.class)
+
     EnvSpec envSpec = new EnvSpec()
     SpringSpec springSpec = new SpringSpec()
 
@@ -100,17 +104,16 @@ class Deployer {
         }
 
         String resourceUuid = header.getFirst(Constants.AGENT_HTTP_HEADER_RESOURCE_UUID)
-        if (resourceUuid != null) {
-            def meta = envSpec.specByUuid(resourceUuid)
-            if (meta != null) {
-                handler = handler.rehydrate(meta, this, this)
-            }
-        }
+        def meta = [
+                "spec": resourceUuid == null ? null : envSpec.specByUuid(resourceUuid)
+        ]
+        handler = handler.rehydrate(meta, this, this)
 
         def entity = new HttpEntity<String>(sb.toString(), header)
         try {
             replyHttpCall(entity, rsp, handler(entity))
         } catch (Throwable t) {
+            logger.warn("error happened when handlign $url", t)
             rsp.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), t.message)
         }
     }
