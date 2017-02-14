@@ -1,6 +1,5 @@
 package org.zstack.testlib
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.zstack.header.exception.CloudRuntimeException
 import org.zstack.utils.ShellUtils
 import org.zstack.utils.Utils
@@ -9,7 +8,7 @@ import org.zstack.utils.logging.CLogger
 /**
  * Created by xing5 on 2017/2/12.
  */
-abstract class Test {
+abstract class Test implements CreationSpec {
     static final CLogger logger = Utils.getLogger(this.getClass())
 
     private final int PHASE_NONE = 0
@@ -28,7 +27,7 @@ abstract class Test {
         return deployer.envSpec
     }
 
-    protected void spring(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = Deployer.SpringSpec.class) Closure c) {
+    protected void spring(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = SpringSpec.class) Closure c) {
         def code = c.rehydrate(deployer.springSpec, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
         code()
@@ -45,6 +44,7 @@ abstract class Test {
     protected boolean DEPLOY_DB = true
     protected boolean NEED_WEB_SERVER = true
     protected boolean API_PORTAL = true
+    protected boolean INCLUDE_CORE_SERVICES = true
     protected boolean DOC = ""
 
     private void deployDB() {
@@ -96,6 +96,12 @@ abstract class Test {
                 include("ManagementNodeManager.xml")
                 include("ApiMediator.xml")
                 include("AccountManager.xml")
+            }
+        }
+
+        if (INCLUDE_CORE_SERVICES) {
+            spring {
+                includeCoreServices()
             }
         }
 

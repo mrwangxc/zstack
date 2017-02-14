@@ -11,10 +11,10 @@ import org.zstack.utils.gson.JSONObjectUtil
 class EnvSpec {
     private List<ZoneSpec> zones = []
 
-    SessionInventory adminSession
+    SessionInventory session
 
-    private Map specsByName = [:]
-    private Map specsByUuid = [:]
+    Map specsByName = [:]
+    Map specsByUuid = [:]
 
     void zone(String name, String description) {
         zones.add(new ZoneSpec(name, description))
@@ -30,12 +30,16 @@ class EnvSpec {
     }
 
     void adminLogin() {
+        login(AccountConstant.INITIAL_SYSTEM_ADMIN_NAME, AccountConstant.INITIAL_SYSTEM_ADMIN_PASSWORD)
+    }
+
+    void login(String accountName, String password) {
         LogInByAccountAction a = new LogInByAccountAction()
-        a.accountName = AccountConstant.INITIAL_SYSTEM_ADMIN_NAME
-        a.password = AccountConstant.INITIAL_SYSTEM_ADMIN_PASSWORD
+        a.accountName = accountName
+        a.password = password
         def res = a.call()
         assert res.error == null : "Login failure: ${JSONObjectUtil.toJsonString(res.error)}"
-        adminSession = res.value.inventory
+        session = res.value.inventory
     }
 
     def specByUuid(String uuid) {
@@ -49,13 +53,6 @@ class EnvSpec {
     void deploy() {
         adminLogin()
 
-        zones.each { node ->
-            node.walk {
-                println("xxxxxxxxxxxxxxxxxxxxxxxxxxx $it")
-                SpecID id = (it as CreateAction).create(adminSession.uuid)
-                specsByName[id.name] = it
-                specsByUuid[id.uuid] = it
-            }
-        }
+        zones.each { it.deploy() }
     }
 }

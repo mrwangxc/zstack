@@ -1,10 +1,7 @@
 package org.zstack.testlib
 
-import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Configuration
 import org.springframework.http.*
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
-import org.springframework.stereotype.Controller
 import org.springframework.web.client.RestTemplate
 import org.zstack.core.CoreGlobalProperty
 import org.zstack.core.componentloader.ComponentLoader
@@ -21,19 +18,6 @@ import javax.servlet.http.HttpServletResponse
  */
 
 class Deployer {
-    class SpringSpec {
-        private List<String> xmls = []
-        private boolean all
-
-        void include(String xml) {
-            xmls.add(xml)
-        }
-
-        void includeAll() {
-            all = true
-        }
-    }
-
     EnvSpec envSpec = new EnvSpec()
     SpringSpec springSpec = new SpringSpec()
 
@@ -117,9 +101,9 @@ class Deployer {
 
         String resourceUuid = header.getFirst(Constants.AGENT_HTTP_HEADER_RESOURCE_UUID)
         if (resourceUuid != null) {
-            def spec = envSpec.specByUuid(resourceUuid)
-            if (spec != null) {
-                handler = handler.rehydrate(spec, this, this)
+            def meta = envSpec.specByUuid(resourceUuid)
+            if (meta != null) {
+                handler = handler.rehydrate(meta, this, this)
             }
         }
 

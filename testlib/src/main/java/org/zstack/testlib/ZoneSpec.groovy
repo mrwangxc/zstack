@@ -7,7 +7,7 @@ import org.zstack.sdk.ZoneInventory
 /**
  * Created by xing5 on 2017/2/12.
  */
-class ZoneSpec implements Node, CreateAction, Tag {
+class ZoneSpec implements Node, CreateAction, Tag, CreationSpec {
     String name
     String description
     List<ClusterSpec> clusters = []
@@ -33,7 +33,7 @@ class ZoneSpec implements Node, CreateAction, Tag {
         return cspec
     }
 
-    PrimaryStorageSpec nfsPrimaryStorageSpec(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = PrimaryStorageSpec.class) Closure c) {
+    PrimaryStorageSpec nfsPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_ONLY, value = PrimaryStorageSpec.class) Closure c) {
         def nspec = new NfsPrimaryStorageSpec()
         def code = c.rehydrate(nspec, this, this)
         code.resolveStrategy = Closure.DELEGATE_ONLY
@@ -44,15 +44,20 @@ class ZoneSpec implements Node, CreateAction, Tag {
     }
 
     void attachPrimaryStorageToCluster(String primaryStorageName, String clusterName) {
-        def ps = primaryStorage.find { it.name == primaryStorageName }
-        assert ps != null : "primary storage[$primaryStorageName] not found, check your environment()"
-        def cluster = clusters.find { it.name == clusterName }
-        assert cluster != null : "cluster[$clusterName] not found, check your environment()"
+        ActionNode an = {
+            def ps = primaryStorage.find { it.name == primaryStorageName }
+            assert ps != null : "primary storage[$primaryStorageName] not found, check your environment()"
+            def cluster = clusters.find { it.name == clusterName }
+            assert cluster != null : "cluster[$clusterName] not found, check your environment()"
 
-        def a = new AttachPrimaryStorageToClusterAction()
-        a.clusterUuid = cluster.inventory.uuid
-        a.primaryStorageUuid = ps.inventory.uuid
-        errorOut(a.call())
+            def a = new AttachPrimaryStorageToClusterAction()
+            a.clusterUuid = cluster.inventory.uuid
+            a.primaryStorageUuid = ps.inventory.uuid
+            a.sessionId = Test.deployer.envSpec.session.uuid
+            errorOut(a.call())
+        }
+
+        addChild(an)
     }
 
     SpecID create(String sessionUuid) {

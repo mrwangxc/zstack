@@ -1,6 +1,4 @@
-import org.zstack.testlib.ClusterSpec
 import org.zstack.testlib.Test
-import org.zstack.testlib.ZoneSpec
 
 /**
  * Created by xing5 on 2017/2/12.
@@ -13,7 +11,8 @@ class Test1 extends Test {
     @Override
     void setup() {
         spring {
-            include("ZoneManager.xml")
+            nfsPrimaryStorage()
+            kvm()
         }
     }
 
@@ -28,15 +27,17 @@ class Test1 extends Test {
                     name = "cluster"
                     hypervisorType = "KVM"
 
+                    /*
                     kvm {
                         name = "kvm"
                         managementIp = "localhost"
                         usedMem = 1000
                         totalCpu = 10
                     }
+                    */
                 }
 
-                nfsPrimaryStorageSpec {
+                nfsPrimaryStorage {
                     name = "nfs"
                     url = "localhost:/nfs"
                 }
@@ -48,6 +49,10 @@ class Test1 extends Test {
 
     @Override
     void test() {
-        println("hello world ${specByName("zone")}")
+        def inv = zone {
+            name = "zone2"
+        }
+
+        println("hello world ${inv.name}")
     }
 }
