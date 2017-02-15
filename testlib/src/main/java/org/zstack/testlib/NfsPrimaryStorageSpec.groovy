@@ -15,13 +15,13 @@ import org.zstack.utils.gson.JSONObjectUtil
  */
 class NfsPrimaryStorageSpec extends PrimaryStorageSpec {
 
-    SpecID create(String uuid, String sessionUuid) {
+    SpecID create(String uuid, String sessionId) {
         inventory = addNfsPrimaryStorage {
             delegate.resourceUuid = uuid
             delegate.name = name
             delegate.description = description
             delegate.url = url
-            delegate.sessionId = sessionUuid
+            delegate.sessionId = sessionId
             delegate.zoneUuid = (parent as ZoneSpec).inventory.uuid
             delegate.userTags = userTags
             delegate.systemTags = systemTags

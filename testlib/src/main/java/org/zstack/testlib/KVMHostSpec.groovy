@@ -25,7 +25,7 @@ class KVMHostSpec extends HostSpec {
         super()
     }
 
-    SpecID create(String uuid, String sessionUuid) {
+    SpecID create(String uuid, String sessionId) {
         inventory = addKVMHost {
             delegate.resourceUuid = uuid
             delegate.name = name
@@ -36,7 +36,7 @@ class KVMHostSpec extends HostSpec {
             delegate.userTags = userTags
             delegate.systemTags = systemTags
             delegate.clusterUuid = (parent as ClusterSpec).inventory.uuid
-            delegate.sessionId = sessionUuid
+            delegate.sessionId = sessionId
         } as HostInventory
 
         return id(name, inventory.uuid)

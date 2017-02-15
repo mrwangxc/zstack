@@ -19,6 +19,11 @@ class Test1 extends Test {
     @Override
     void environment() {
         env {
+            def sid = account {
+                name = "xin"
+                password = "password"
+            }.use()
+
             zone {
                 name = "zone"
                 description = "test"
@@ -43,6 +48,18 @@ class Test1 extends Test {
                 }
 
                 attachPrimaryStorageToCluster("nfs", "cluster")
+
+                l2NoVlanNetwork {
+                    name = "l2"
+                    physicalInterface = "eth0"
+
+                    l3Network {
+                        name = "l3"
+                        session = sid
+                    }
+                }
+
+                attachL2NetworkToCluster("l2", "cluster")
             }
         }.deploy()
     }

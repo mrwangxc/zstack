@@ -1,5 +1,6 @@
 package org.zstack.testlib
 
+import org.zstack.sdk.AttachL2NetworkToClusterAction
 import org.zstack.sdk.AttachPrimaryStorageToClusterAction
 import org.zstack.sdk.CreateZoneAction
 import org.zstack.sdk.ZoneInventory
@@ -7,11 +8,12 @@ import org.zstack.sdk.ZoneInventory
 /**
  * Created by xing5 on 2017/2/12.
  */
-class ZoneSpec implements Node, CreateAction, Tag, CreationSpec {
+class ZoneSpec implements Spec {
     String name
     String description
     List<ClusterSpec> clusters = []
     List<PrimaryStorageSpec> primaryStorage = []
+    List<L2NetworkSpec> l2Networks = []
 
     ZoneInventory inventory
 
@@ -43,6 +45,26 @@ class ZoneSpec implements Node, CreateAction, Tag, CreationSpec {
         return nspec
     }
 
+    L2NetworkSpec l2NoVlanNetwork(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = L2NoVlanNetworkSpec.class) Closure c) {
+        def lspec = new L2NoVlanNetworkSpec()
+        def code = c.rehydrate(lspec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        addChild(lspec)
+        l2Networks.add(lspec)
+        return lspec
+    }
+
+    L2NetworkSpec l2VlanNetwork(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = L2VlanNetworkSpec.class) Closure c) {
+        def lspec = new L2VlanNetworkSpec()
+        def code = c.rehydrate(lspec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        addChild(lspec)
+        l2Networks.add(lspec)
+        return lspec
+    }
+
     void attachPrimaryStorageToCluster(String primaryStorageName, String clusterName) {
         ActionNode an = {
             def ps = primaryStorage.find { it.name == primaryStorageName }
@@ -60,11 +82,28 @@ class ZoneSpec implements Node, CreateAction, Tag, CreationSpec {
         addChild(an)
     }
 
-    SpecID create(String uuid, String sessionUuid) {
+    void attachL2NetworkToCluster(String l2NetworkName, String clusterName) {
+        ActionNode an = {
+            def l2 = l2Networks.find { it.name = l2NetworkName }
+            assert l2 != null: "l2 network[$l2NetworkName] not found, check your environment()"
+            def cluster = clusters.find { it.name == clusterName }
+            assert cluster != null : "cluster[$clusterName] not found, check your environment()"
+
+            def a = new AttachL2NetworkToClusterAction()
+            a.clusterUuid = cluster.inventory.uuid
+            a.l2NetworkUuid = l2.inventory.uuid
+            a.sessionId = Test.deployer.envSpec.session.uuid
+            errorOut(a.call())
+        }
+
+        addChild(an)
+    }
+
+    SpecID create(String uuid, String sessionId) {
         inventory = createZone {
             delegate.resourceUuid = uuid
             delegate.name = name
-            delegate.sessionId = sessionUuid
+            delegate.sessionId = sessionId
             delegate.description = description
             delegate.userTags = userTags
             delegate.systemTags = systemTags

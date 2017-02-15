@@ -45,15 +45,20 @@ trait Node {
         walkNode(this, c)
     }
 
-    void deploy(String sessionUuid = null) {
-        sessionUuid = sessionUuid == null ? Test.deployer.envSpec.session?.uuid : sessionUuid
-        assert sessionUuid != null : "Not login yet!!! You need either call deploy() with a session uuid or call login() method" +
+    void deploy(String sessionId = null) {
+        sessionId = sessionId == null ? Test.deployer.envSpec.session?.uuid : sessionId
+        assert sessionId != null : "Not login yet!!! You need either call deploy() with a session uuid or call login() method" +
                 " in environment() of the test case"
 
         walk {
             def uuid = Platform.getUuid()
             Test.deployer.envSpec.specsByUuid[uuid] = it
-            SpecID id = (it as CreateAction).create(uuid, sessionUuid)
+
+            if (it instanceof HasSession && it.session != null) {
+                sessionId = it.session()
+            }
+
+            SpecID id = (it as CreateAction).create(uuid, sessionId)
             Test.deployer.envSpec.specsByName[id.name] = it
         }
     }

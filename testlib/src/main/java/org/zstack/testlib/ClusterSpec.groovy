@@ -6,7 +6,7 @@ import org.zstack.sdk.CreateClusterAction
 /**
  * Created by xing5 on 2017/2/12.
  */
-class ClusterSpec implements Node, CreateAction, Tag, CreationSpec {
+class ClusterSpec implements Spec {
     String name
     String description
     String hypervisorType
@@ -34,14 +34,14 @@ class ClusterSpec implements Node, CreateAction, Tag, CreationSpec {
         return hspec
     }
 
-    SpecID create(String uuid, String sessionUuid) {
+    SpecID create(String uuid, String sessionId) {
         inventory = createCluster {
             delegate.resourceUuid = uuid
             delegate.name = name
             delegate.description = description
             delegate.hypervisorType = hypervisorType
             delegate.zoneUuid = (parent as ZoneSpec).inventory.uuid
-            delegate.sessionId = sessionUuid
+            delegate.sessionId = sessionId
             delegate.userTags = userTags
             delegate.systemTags = systemTags
         } as ClusterInventory

@@ -8,8 +8,9 @@ import org.zstack.utils.gson.JSONObjectUtil
 /**
  * Created by xing5 on 2017/2/12.
  */
-class EnvSpec {
+class EnvSpec implements Node {
     private List<ZoneSpec> zones = []
+    List<AccountSpec> accounts = []
 
     SessionInventory session
 
@@ -26,20 +27,31 @@ class EnvSpec {
         code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
         zones.add(zspec)
+        addChild(zspec)
         return zspec
     }
 
-    void adminLogin() {
-        login(AccountConstant.INITIAL_SYSTEM_ADMIN_NAME, AccountConstant.INITIAL_SYSTEM_ADMIN_PASSWORD)
+    AccountSpec account(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = AccountSpec.class) Closure c) {
+        def aspec = new AccountSpec()
+        def code = c.rehydrate(aspec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        addChild(aspec)
+        accounts.add(aspec)
+        return aspec
     }
 
-    void login(String accountName, String password) {
+    void adminLogin() {
+        session = login(AccountConstant.INITIAL_SYSTEM_ADMIN_NAME, AccountConstant.INITIAL_SYSTEM_ADMIN_PASSWORD)
+    }
+
+    SessionInventory login(String accountName, String password) {
         LogInByAccountAction a = new LogInByAccountAction()
         a.accountName = accountName
         a.password = password
         def res = a.call()
         assert res.error == null : "Login failure: ${JSONObjectUtil.toJsonString(res.error)}"
-        session = res.value.inventory
+        return res.value.inventory
     }
 
     def specByUuid(String uuid) {
@@ -53,6 +65,10 @@ class EnvSpec {
     void deploy() {
         adminLogin()
 
-        zones.each { it.deploy() }
+        children.each {
+            if (it instanceof Node) {
+                it.deploy()
+            }
+        }
     }
 }

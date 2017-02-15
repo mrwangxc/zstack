@@ -4,7 +4,7 @@ package org.zstack.testlib
  */
 trait CreateAction {
     // return uuid of the created resource
-    abstract SpecID create(String uuid, String sessionUuid)
+    abstract SpecID create(String uuid, String sessionId)
 
     SpecID id(String name, String uuid) {
         return new SpecID(name, uuid)
