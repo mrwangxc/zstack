@@ -44,7 +44,11 @@ import org.zstack.utils.gson.JSONObjectUtil
 trait CreationSpec {
     def errorOut(res) {
         assert res.error == null : "API failure: \${JSONObjectUtil.toJsonString(res.error)}"
-        return res.value.inventory
+        if (res.value.hasProperty("inventory")) {
+            return res.value.inventory
+        } else {
+            return res.value.inventories
+        }
     }
     
     ${groovyActions.join("\n")}

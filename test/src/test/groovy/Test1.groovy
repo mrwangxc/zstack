@@ -13,6 +13,8 @@ class Test1 extends Test {
         spring {
             nfsPrimaryStorage()
             kvm()
+            vyos()
+            eip()
         }
     }
 
@@ -56,6 +58,12 @@ class Test1 extends Test {
                     l3Network {
                         name = "l3"
                         session = sid
+
+                        service {
+                            provider = "vrouter"
+                            types = ["DHCP", "DNS"]
+                            session = sid
+                        }
                     }
                 }
 

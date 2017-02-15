@@ -21,4 +21,13 @@ class L3NetworkSpec implements Spec, HasSession {
 
         return id(name, inventory.uuid)
     }
+
+    NetworkServiceSpec service(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = NetworkServiceSpec.class) Closure c) {
+        def spec = new NetworkServiceSpec()
+        def code = c.rehydrate(spec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        addChild(spec)
+        return spec
+    }
 }

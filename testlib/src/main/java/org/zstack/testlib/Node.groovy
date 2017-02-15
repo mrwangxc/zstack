@@ -59,7 +59,9 @@ trait Node {
             }
 
             SpecID id = (it as CreateAction).create(uuid, sessionId)
-            Test.deployer.envSpec.specsByName[id.name] = it
+            if (id != null) {
+                Test.deployer.envSpec.specsByName[id.name] = it
+            }
         }
     }
 }

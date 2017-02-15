@@ -41,6 +41,17 @@ class SpringSpec {
         include("NfsPrimaryStorage.xml")
     }
 
+    void vyos() {
+        include("ApplianceVmFacade.xml")
+        include("VirtualRouter.xml")
+        include("vyos.xml")
+    }
+
+    void eip() {
+        include("vip.xml")
+        include("eip.xml")
+    }
+
     void kvm() {
         include("Kvm.xml")
     }
