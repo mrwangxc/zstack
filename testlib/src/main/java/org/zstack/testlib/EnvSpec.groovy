@@ -1,6 +1,7 @@
 package org.zstack.testlib
 
 import org.zstack.header.identity.AccountConstant
+import org.zstack.sdk.AttachBackupStorageToZoneAction
 import org.zstack.sdk.LogInByAccountAction
 import org.zstack.sdk.SessionInventory
 import org.zstack.utils.gson.JSONObjectUtil
@@ -39,6 +40,42 @@ class EnvSpec implements Node {
         addChild(aspec)
         accounts.add(aspec)
         return aspec
+    }
+
+    InstanceOfferingSpec instanceOffering(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = InstanceOfferingSpec.class) Closure c) {
+        def spec = new InstanceOfferingSpec()
+        def code = c.rehydrate(spec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        addChild(spec)
+        return spec
+    }
+
+    BackupStorageSpec sftpBackupStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SftpBackupStorageSpec.class) Closure c) {
+        def spec = new SftpBackupStorageSpec()
+        def code = c.rehydrate(spec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        addChild(spec)
+        return spec
+    }
+
+    void attachBackupStorageToZone(String backupStorageName, String zoneName) {
+        BackupStorageSpec bs = find(backupStorageName, BackupStorageSpec.class)
+        assert bs != null: "cannot find the backup storage[$backupStorageName], unable to do attachBackupStorageToZone()"
+        ZoneSpec zone = find(zoneName, ZoneSpec.class)
+        assert zone != null: "cannot find the zone[$zoneName], unable tot do attachBackupStorageToZone()"
+
+        ActionNode an = {
+            def a = new AttachBackupStorageToZoneAction()
+            a.zoneUuid = zone.inventory.uuid
+            a.backupStorageUuid = bs.inventory.uuid
+            a.sessionId = session.uuid
+            def res = a.call()
+            assert res.error == null : "AttachBackupStorageToZoneAction failure: ${JSONObjectUtil.toJsonString(res.error)}"
+        }
+
+        addChild(an)
     }
 
     void adminLogin() {

@@ -47,6 +47,10 @@ class SpringSpec {
         include("vyos.xml")
     }
 
+    void sftpBackupStorage() {
+        include("SftpBackupStorage.xml")
+    }
+
     void eip() {
         include("vip.xml")
         include("eip.xml")

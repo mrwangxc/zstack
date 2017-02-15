@@ -45,6 +45,27 @@ trait Node {
         walkNode(this, c)
     }
 
+    def find(Node n, String name, Class type) {
+        if (type.isAssignableFrom(n.class) && n.name == name) {
+            return n
+        }
+
+        for (Object c : n.children) {
+            if (c instanceof Node) {
+                def ret = find(c, name, type)
+                if (ret != null) {
+                    return ret
+                }
+            }
+        }
+
+        return null
+    }
+
+    def find(String name, Class type) {
+        return find(this, name, type)
+    }
+
     void deploy(String sessionId = null) {
         sessionId = sessionId == null ? Test.deployer.envSpec.session?.uuid : sessionId
         assert sessionId != null : "Not login yet!!! You need either call deploy() with a session uuid or call login() method" +

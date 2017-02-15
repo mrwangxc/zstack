@@ -6,6 +6,10 @@ import org.zstack.testlib.CreationSpecGenerator
 class Test2 {
     @org.junit.Test
     void test() {
-        new CreationSpecGenerator().generate("/root/zstack-testlib/CreationSpec.groovy")
+        //new CreationSpecGenerator().generate("/root/zstack-testlib/CreationSpec.groovy")
+
+        def m = {}
+
+        println("${m() == false}")
     }
 }

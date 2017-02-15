@@ -14,6 +14,7 @@ class ZoneSpec implements Spec {
     List<ClusterSpec> clusters = []
     List<PrimaryStorageSpec> primaryStorage = []
     List<L2NetworkSpec> l2Networks = []
+    List<VirtualRouterOfferingSpec> virtualRouterOfferingSpecs = []
 
     ZoneInventory inventory
 
@@ -97,6 +98,16 @@ class ZoneSpec implements Spec {
         }
 
         addChild(an)
+    }
+
+    VirtualRouterOfferingSpec virtualRouterOffering(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = VirtualRouterOfferingSpec.class) Closure c) {
+        def spec = new VirtualRouterOfferingSpec()
+        def code = c.rehydrate(spec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        addChild(spec)
+        virtualRouterOfferingSpecs.add(spec)
+        return spec
     }
 
     SpecID create(String uuid, String sessionId) {

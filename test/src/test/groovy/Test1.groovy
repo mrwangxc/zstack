@@ -15,6 +15,7 @@ class Test1 extends Test {
             kvm()
             vyos()
             eip()
+            sftpBackupStorage()
         }
     }
 
@@ -25,6 +26,19 @@ class Test1 extends Test {
                 name = "xin"
                 password = "password"
             }.use()
+
+            sftpBackupStorage {
+                name = "sftp"
+                url = "/sftp"
+                username = "root"
+                password = "password"
+                hostname = "localhost"
+
+                image {
+                    name = "image1"
+                    url  = " http://zstack.org/download/test.qcow2"
+                }
+            }
 
             zone {
                 name = "zone"
@@ -69,6 +83,9 @@ class Test1 extends Test {
 
                 attachL2NetworkToCluster("l2", "cluster")
             }
+
+            attachBackupStorageToZone("sftp", "zone")
+
         }.deploy()
     }
 

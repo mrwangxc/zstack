@@ -1,0 +1,48 @@
+package org.zstack.testlib
+
+/**
+ * Created by xing5 on 2017/2/15.
+ */
+class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
+    Closure managementL3Network
+    Closure publicL3Network
+    Closure image
+    Closure zone
+    Boolean isDefault
+
+    @Override
+    SpecID create(String uuid, String sessionId) {
+        inventory = createVirtualRouterOffering {
+            delegate.resourceUuid = uuid
+            delegate.name = name
+            delegate.memorySize = memory
+            delegate.cpuNum = cpu
+            delegate.allocatorStrategy = allocatorStrategy
+            delegate.userTags = userTags
+            delegate.systemTags = systemTags
+            delegate.managementNetworkUuid = managementL3Network()
+            delegate.publicNetworkUuid = publicL3Network()
+            delegate.imageUuid = image()
+            delegate.zoneUuid = zone()
+            delegate.isDefault = isDefault
+        }
+
+        return id(name, inventory.uuid)
+    }
+
+    Closure l3Network(String name) {
+        return {
+            L3NetworkSpec l3 = findSpec(name, L3NetworkSpec.class)
+            assert l3 != null: "cannot find the L3 network[$name] defined in VirtualRouterOfferingSpec"
+            return l3.inventory.uuid
+        }
+    }
+
+    Closure image(String name) {
+        return {
+            ImageSpec i = findSpec(name, ImageSpec.class)
+            assert i != null: "cannot find the image[$name] defined in VirtualRouterOfferingSpec"
+            return i.inventory.uuid
+        }
+    }
+}
