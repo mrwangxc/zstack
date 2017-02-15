@@ -103,15 +103,18 @@ class Deployer {
             header.add(name, req.getHeader(name))
         }
 
-        String resourceUuid = header.getFirst(Constants.AGENT_HTTP_HEADER_RESOURCE_UUID)
-        def meta = [
-                "spec": resourceUuid == null ? null : envSpec.specByUuid(resourceUuid)
-        ]
-        handler = handler.rehydrate(meta, this, this)
-
         def entity = new HttpEntity<String>(sb.toString(), header)
         try {
-            replyHttpCall(entity, rsp, handler(entity))
+            def ret
+            if (handler.maximumNumberOfParameters == 0) {
+                ret = handler()
+            } else if (handler.maximumNumberOfParameters == 1) {
+                ret = handler(entity)
+            } else {
+                ret = handler(entity, envSpec)
+            }
+
+            replyHttpCall(entity, rsp, ret)
         } catch (Throwable t) {
             logger.warn("error happened when handlign $url", t)
             rsp.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), t.message)

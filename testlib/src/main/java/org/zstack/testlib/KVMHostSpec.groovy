@@ -43,8 +43,9 @@ class KVMHostSpec extends HostSpec {
     }
 
     static {
-        Deployer.simulator(KVMConstant.KVM_HOST_CAPACITY_PATH) {
+        Deployer.simulator(KVMConstant.KVM_HOST_CAPACITY_PATH) { HttpEntity<String> e, EnvSpec espec ->
             def rsp = new KVMAgentCommands.HostCapacityResponse()
+            KVMHostSpec spec = espec.specByUuid(e.getHeaders().getFirst(Constants.AGENT_HTTP_HEADER_RESOURCE_UUID))
             rsp.success = true
             rsp.usedCpu = spec.usedCpu
             rsp.cpuNum = spec.totalCpu
@@ -128,8 +129,7 @@ class KVMHostSpec extends HostSpec {
         }
 
         Deployer.simulator(KVMConstant.KVM_VM_SYNC_PATH) { HttpEntity<String> e ->
-            def hostUuid = spec?.inventory?.uuid
-            hostUuid = hostUuid == null ? e.getHeaders().getFirst(Constants.AGENT_HTTP_HEADER_RESOURCE_UUID) : hostUuid
+            def hostUuid = e.getHeaders().getFirst(Constants.AGENT_HTTP_HEADER_RESOURCE_UUID)
 
             List<Tuple> states = Q.New(VmInstanceVO.class)
                     .select(VmInstanceVO_.uuid, VmInstanceVO_.state).eq(VmInstanceVO_.state, VmInstanceState.Running)
