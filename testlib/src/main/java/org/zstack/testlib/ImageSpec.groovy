@@ -31,6 +31,7 @@ class ImageSpec implements Spec, HasSession {
             delegate.userTags = userTags
             delegate.systemTags = systemTags
             delegate.sessionId = sessionId
+            delegate.backupStorageUuids = [(parent as BackupStorageSpec).inventory.uuid]
         }
 
         return id(name, inventory.uuid)

@@ -60,6 +60,15 @@ class EnvSpec implements Node {
         return spec
     }
 
+    DiskOfferingSpec diskOffering(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiskOfferingSpec.class) Closure c) {
+        def spec = new DiskOfferingSpec()
+        def code = c.rehydrate(spec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        addChild(spec)
+        return spec
+    }
+
     void attachBackupStorageToZone(String backupStorageName, String zoneName) {
         BackupStorageSpec bs = find(backupStorageName, BackupStorageSpec.class)
         assert bs != null: "cannot find the backup storage[$backupStorageName], unable to do attachBackupStorageToZone()"

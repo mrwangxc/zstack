@@ -24,7 +24,6 @@ public class APICreateInstanceOfferingMsg extends APICreateMessage {
     private String description;
     @APIParam(numberRange = {1, 1024})
     private int cpuNum;
-    @APIParam(numberRange = {1, Integer.MAX_VALUE})
     private int cpuSpeed;
     @APIParam(numberRange = {1, Long.MAX_VALUE})
     private long memorySize;

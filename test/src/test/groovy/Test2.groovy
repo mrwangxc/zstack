@@ -7,9 +7,10 @@ class Test2 {
     @org.junit.Test
     void test() {
         //new CreationSpecGenerator().generate("/root/zstack-testlib/CreationSpec.groovy")
+        simple(name: 1)
+    }
 
-        def m = {}
-
-        println("${m() == false}")
+    void simple(Map params) {
+        println(params)
     }
 }

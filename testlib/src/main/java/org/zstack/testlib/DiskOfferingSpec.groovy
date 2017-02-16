@@ -1,0 +1,26 @@
+package org.zstack.testlib
+
+import org.zstack.sdk.DiskOfferingInventory
+
+/**
+ * Created by xing5 on 2017/2/16.
+ */
+class DiskOfferingSpec implements Spec, HasSession {
+    String name
+    String description
+    Long diskSize
+    String allocatorStrategy
+
+    DiskOfferingInventory inventory
+
+    SpecID create(String uuid, String sessionId) {
+        inventory = createDiskOffering {
+            delegate.name = name
+            delegate.description = description
+            delegate.diskSize = diskSize
+            delegate.allocationStrategy = allocatorStrategy
+        }
+
+        return id(name, inventory.uuid)
+    }
+}

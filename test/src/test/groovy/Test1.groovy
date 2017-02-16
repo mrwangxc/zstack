@@ -1,4 +1,7 @@
+import org.zstack.testlib.DiskOfferingSpec
+import org.zstack.testlib.EnvSpec
 import org.zstack.testlib.Test
+import org.zstack.utils.data.SizeUnit
 
 /**
  * Created by xing5 on 2017/2/12.
@@ -7,6 +10,8 @@ import org.zstack.testlib.Test
  */
 class Test1 extends Test {
     boolean success
+    DiskOfferingSpec diskOfferingSpec
+    EnvSpec envSpec
 
     @Override
     void setup() {
@@ -21,11 +26,22 @@ class Test1 extends Test {
 
     @Override
     void environment() {
-        env {
+        envSpec = env {
             def sid = account {
                 name = "xin"
                 password = "password"
             }.use()
+
+            diskOffering {
+                name = "diskOffering"
+                diskSize = SizeUnit.GIGABYTE.toByte(10)
+            }
+
+            instanceOffering {
+                name = "instanceOffering"
+                memory = SizeUnit.GIGABYTE.toByte(8)
+                cpu = 4
+            }
 
             sftpBackupStorage {
                 name = "sftp"
@@ -36,7 +52,7 @@ class Test1 extends Test {
 
                 image {
                     name = "image1"
-                    url  = " http://zstack.org/download/test.qcow2"
+                    url  = "http://zstack.org/download/test.qcow2"
                 }
             }
 
@@ -82,6 +98,15 @@ class Test1 extends Test {
                 }
 
                 attachL2NetworkToCluster("l2", "cluster")
+
+                virtualRouterOffering {
+                    name = "vr"
+                    memory = SizeUnit.MEGABYTE.toByte(512)
+                    cpu = 2
+                    managementL3Network = l3Network("l3")
+                    publicL3Network = l3Network("l3")
+                    image = image("vr")
+                }
             }
 
             attachBackupStorageToZone("sftp", "zone")
@@ -91,5 +116,7 @@ class Test1 extends Test {
 
     @Override
     void test() {
+        diskOfferingSpec = envSpec.find("diskOffering", DiskOfferingSpec.class)
+        println("${diskOfferingSpec.name}")
     }
 }
