@@ -99,7 +99,7 @@ class EnvSpec implements Node {
         return specsByName[name]
     }
 
-    void deploy() {
+    EnvSpec create() {
         adminLogin()
 
         children.each {
@@ -107,5 +107,7 @@ class EnvSpec implements Node {
                 it.deploy()
             }
         }
+
+        return this
     }
 }

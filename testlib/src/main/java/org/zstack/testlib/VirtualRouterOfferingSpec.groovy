@@ -30,12 +30,20 @@ class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
         return id(name, inventory.uuid)
     }
 
-    Closure l3Network(String name) {
+    private Closure l3Network(String name) {
         return {
             L3NetworkSpec l3 = findSpec(name, L3NetworkSpec.class)
             assert l3 != null: "cannot find the L3 network[$name] defined in VirtualRouterOfferingSpec"
             return l3.inventory.uuid
         }
+    }
+
+    void useManagementL3Network(String name) {
+        managementL3Network = l3Network(name)
+    }
+
+    void usePublicL3Network(String name) {
+        publicL3Network = l3Network(name)
     }
 
     void useImage(String name) {

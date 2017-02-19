@@ -84,5 +84,11 @@ trait Node {
                 Test.deployer.envSpec.specsByName[id.name] = it
             }
         }
+
+        walk {
+            if (it instanceof CreateAction) {
+                it.postCreate()
+            }
+        }
     }
 }

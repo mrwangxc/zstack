@@ -54,6 +54,11 @@ class Test1 extends Test {
                     name = "image1"
                     url  = "http://zstack.org/download/test.qcow2"
                 }
+
+                image {
+                    name = "vr"
+                    url  = "http://zstack.org/download/vr.qcow2"
+                }
             }
 
             zone {
@@ -72,14 +77,15 @@ class Test1 extends Test {
                         usedMem = 1000
                         totalCpu = 10
                     }
+
+                    attachPrimaryStorage("nfs")
+                    attachL2Network("l2")
                 }
 
                 nfsPrimaryStorage {
                     name = "nfs"
                     url = "localhost:/nfs"
                 }
-
-                attachPrimaryStorageToCluster("nfs", "cluster")
 
                 l2NoVlanNetwork {
                     name = "l2"
@@ -97,21 +103,18 @@ class Test1 extends Test {
                     }
                 }
 
-                attachL2NetworkToCluster("l2", "cluster")
-
                 virtualRouterOffering {
                     name = "vr"
                     memory = SizeUnit.MEGABYTE.toByte(512)
                     cpu = 2
-                    managementL3Network = l3Network("l3")
-                    publicL3Network = l3Network("l3")
-                    image = image("vr")
+                    useManagementL3Network("l3")
+                    usePublicL3Network("l3")
+                    useImage("vr")
                 }
+
+                attachBackupStorage("sftp")
             }
-
-            attachBackupStorageToZone("sftp", "zone")
-
-        }.deploy()
+        }.create()
     }
 
     @Override

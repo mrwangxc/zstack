@@ -105,14 +105,14 @@ class ZoneSpec implements Spec {
 
     void attachBackupStorage(String...names) {
         afterCreated.addAll(names.collect { String bsName ->
-            return { String sessionId ->
+            return {
                 BackupStorageSpec bs = findSpec(bsName, BackupStorageSpec.class)
                 assert bs != null: "cannot find the backup storage[$bsName], unable to do attachBackupStorageToZone()"
 
                 def a = new AttachBackupStorageToZoneAction()
                 a.zoneUuid = inventory.uuid
                 a.backupStorageUuid = bs.inventory.uuid
-                a.sessionId = sessionId
+                a.sessionId = Test.deployer.envSpec.session.uuid
                 def res = a.call()
                 assert res.error == null : "AttachBackupStorageToZoneAction failure: ${JSONObjectUtil.toJsonString(res.error)}"
             }
@@ -121,9 +121,9 @@ class ZoneSpec implements Spec {
 
     VirtualRouterOfferingSpec virtualRouterOffering(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = VirtualRouterOfferingSpec.class) Closure c) {
         def spec = new VirtualRouterOfferingSpec()
-        def code = c.rehydrate(spec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(spec)
         virtualRouterOfferingSpecs.add(spec)
         return spec
@@ -139,8 +139,11 @@ class ZoneSpec implements Spec {
             delegate.systemTags = systemTags
         } as ZoneInventory
 
-        afterCreated.each { it(sessionId) }
-
         return id(name, inventory.uuid)
+    }
+
+    @Override
+    void postCreate() {
+        afterCreated.each { it() }
     }
 }

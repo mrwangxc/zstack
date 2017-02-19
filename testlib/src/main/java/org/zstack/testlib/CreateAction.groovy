@@ -9,4 +9,7 @@ trait CreateAction {
     SpecID id(String name, String uuid) {
         return new SpecID(name, uuid)
     }
+
+    void postCreate() {
+    }
 }
