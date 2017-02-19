@@ -24,10 +24,19 @@ class L3NetworkSpec implements Spec, HasSession {
 
     NetworkServiceSpec service(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = NetworkServiceSpec.class) Closure c) {
         def spec = new NetworkServiceSpec()
-        def code = c.rehydrate(spec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(spec)
+        return spec
+    }
+
+    IpRangeSpec ip(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = IpRangeSpec.class) Closure c) {
+        def spec = new IpRangeSpec()
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
+        addChild(c)
         return spec
     }
 }

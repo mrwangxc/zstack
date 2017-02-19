@@ -14,9 +14,9 @@ abstract class L2NetworkSpec implements Spec {
 
     L3NetworkSpec l3Network(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = L3NetworkSpec.class) Closure c) {
         def l3 = new L3NetworkSpec()
-        def code = c.rehydrate(l3, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = l3
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(l3)
 
         return l3

@@ -6,7 +6,7 @@ import org.zstack.sdk.IpRangeInventory
  * Created by xing5 on 2017/2/15.
  */
 class IpRangeSpec implements Spec, HasSession {
-    String name
+    String name = "ip-range"
     String description
     String startIp
     String endIp

@@ -31,9 +31,9 @@ class ZoneSpec implements Spec {
 
     ClusterSpec cluster(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ClusterSpec.class) Closure c) {
         def cspec = new ClusterSpec()
-        def code = c.rehydrate(cspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = cspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(cspec)
         clusters.add(cspec)
         return cspec
@@ -41,9 +41,9 @@ class ZoneSpec implements Spec {
 
     PrimaryStorageSpec nfsPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = PrimaryStorageSpec.class) Closure c) {
         def nspec = new NfsPrimaryStorageSpec()
-        def code = c.rehydrate(nspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = nspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(nspec)
         primaryStorage.add(nspec)
         return nspec
@@ -51,9 +51,9 @@ class ZoneSpec implements Spec {
 
     L2NetworkSpec l2NoVlanNetwork(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = L2NoVlanNetworkSpec.class) Closure c) {
         def lspec = new L2NoVlanNetworkSpec()
-        def code = c.rehydrate(lspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = lspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(lspec)
         l2Networks.add(lspec)
         return lspec
@@ -61,46 +61,12 @@ class ZoneSpec implements Spec {
 
     L2NetworkSpec l2VlanNetwork(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = L2VlanNetworkSpec.class) Closure c) {
         def lspec = new L2VlanNetworkSpec()
-        def code = c.rehydrate(lspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = lspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(lspec)
         l2Networks.add(lspec)
         return lspec
-    }
-
-    void attachPrimaryStorageToCluster(String primaryStorageName, String clusterName) {
-        ActionNode an = {
-            def ps = primaryStorage.find { it.name == primaryStorageName }
-            assert ps != null : "primary storage[$primaryStorageName] not found, check your environment()"
-            def cluster = clusters.find { it.name == clusterName }
-            assert cluster != null : "cluster[$clusterName] not found, check your environment()"
-
-            def a = new AttachPrimaryStorageToClusterAction()
-            a.clusterUuid = cluster.inventory.uuid
-            a.primaryStorageUuid = ps.inventory.uuid
-            a.sessionId = Test.deployer.envSpec.session.uuid
-            errorOut(a.call())
-        }
-
-        addChild(an)
-    }
-
-    void attachL2NetworkToCluster(String l2NetworkName, String clusterName) {
-        ActionNode an = {
-            def l2 = l2Networks.find { it.name = l2NetworkName }
-            assert l2 != null: "l2 network[$l2NetworkName] not found, check your environment()"
-            def cluster = clusters.find { it.name == clusterName }
-            assert cluster != null : "cluster[$clusterName] not found, check your environment()"
-
-            def a = new AttachL2NetworkToClusterAction()
-            a.clusterUuid = cluster.inventory.uuid
-            a.l2NetworkUuid = l2.inventory.uuid
-            a.sessionId = Test.deployer.envSpec.session.uuid
-            errorOut(a.call())
-        }
-
-        addChild(an)
     }
 
     void attachBackupStorage(String...names) {

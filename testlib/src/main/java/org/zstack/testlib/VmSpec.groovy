@@ -20,6 +20,10 @@ class VmSpec implements Spec, HasSession {
     VmInstanceInventory inventory
 
     void useInstanceOffering(String name) {
+        postCreate {
+            addDependency(name, InstanceOfferingSpec.class)
+        }
+
         instanceOffering = {
             InstanceOfferingSpec spec = findSpec(name, InstanceOfferingSpec.class)
             assert spec != null: "cannot find instance offering[$name], check the vm block of environment"
@@ -28,6 +32,10 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useImage(String name) {
+        postCreate {
+            addDependency(name, ImageSpec.class)
+        }
+
         image = {
             ImageSpec spec = findSpec(name, ImageSpec.class)
             assert spec != null: "cannot find image[$name], check the vm block of environment"
@@ -36,6 +44,10 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useRootDiskOffering(String name) {
+        postCreate {
+            addDependency(name, DiskOfferingSpec.class)
+        }
+
         rootDiskOffering = {
             DiskOfferingSpec spec = findSpec(name, DiskOfferingSpec.class)
             assert spec != null: "cannot find useRootDiskOffering[$name], check the vm block of environment"
@@ -44,6 +56,10 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useCluster(String name) {
+        postCreate {
+            addDependency(name, ClusterSpec.class)
+        }
+
         cluster = {
             ClusterSpec spec = findSpec(name, ClusterSpec.class)
             assert spec != null: "cannot find cluster[$name], check the vm block of environment"
@@ -52,6 +68,10 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useHost(String name) {
+        postCreate {
+            addDependency(name, HostSpec.class)
+        }
+
         host = {
             HostSpec spec = findSpec(name, HostSpec.class)
             assert spec != null: "cannot find host[$name], check the vm block of environment"
@@ -60,6 +80,12 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useDiskOfferings(String... names) {
+        names.each { String name ->
+            postCreate {
+                addDependency(name, DiskOfferingSpec.class)
+            }
+        }
+
         diskOfferings = {
             return names.collect { name ->
                 DiskOfferingSpec spec = findSpec(name, DiskOfferingSpec.class)
@@ -70,6 +96,12 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useL3Networks(String... names) {
+        names.each { String name ->
+            postCreate {
+                addDependency(name, L3NetworkSpec.class)
+            }
+        }
+
         l3Networks = {
             return names.collect { name ->
                 L3NetworkSpec spec = findSpec(name, L3NetworkSpec.class)
@@ -80,6 +112,10 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useDefaultL3Network(String name) {
+        postCreate {
+            addDependency(name, L3NetworkSpec.class)
+        }
+
         defaultL3Network = {
             L3NetworkSpec spec = findSpec(name, L3NetworkSpec.class)
             assert spec != null: "cannot find defaultL3Network[$name], check the vm block of environment"

@@ -17,9 +17,9 @@ abstract class BackupStorageSpec implements Spec {
 
     ImageSpec image(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ImageSpec.class) Closure c) {
         def i = new ImageSpec()
-        def code = c.rehydrate(i, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = i
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(i)
         return i
     }

@@ -1,5 +1,7 @@
 package org.zstack.testlib
 
+import org.zstack.sdk.L2NetworkInventory
+
 /**
  * Created by xing5 on 2017/2/15.
  */
@@ -17,7 +19,7 @@ class L2VlanNetworkSpec extends L2NetworkSpec {
             delegate.systemTags = systemTags
             delegate.sessionId = sessionId
             delegate.zoneUuid = (parent as ZoneSpec).inventory.uuid
-        }
+        } as L2NetworkInventory
 
         return id(name, inventory.uuid)
     }

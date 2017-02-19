@@ -24,9 +24,9 @@ class EnvSpec implements Node {
 
     ZoneSpec zone(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ZoneSpec.class) Closure c)  {
         def zspec = new ZoneSpec()
-        def code = c.rehydrate(zspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = zspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         zones.add(zspec)
         addChild(zspec)
         return zspec
@@ -44,35 +44,35 @@ class EnvSpec implements Node {
 
     InstanceOfferingSpec instanceOffering(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = InstanceOfferingSpec.class) Closure c) {
         def spec = new InstanceOfferingSpec()
-        def code = c.rehydrate(spec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(spec)
         return spec
     }
 
     BackupStorageSpec sftpBackupStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SftpBackupStorageSpec.class) Closure c) {
         def spec = new SftpBackupStorageSpec()
-        def code = c.rehydrate(spec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c.delegate = spec
+        c()
         addChild(spec)
         return spec
     }
 
     DiskOfferingSpec diskOffering(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = DiskOfferingSpec.class) Closure c) {
         def spec = new DiskOfferingSpec()
-        def code = c.rehydrate(spec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(spec)
         return spec
     }
 
     VmSpec vm(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = VmSpec.class) Closure c) {
         def spec = new VmSpec()
-        def code = c.rehydrate(spec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
         code()
         addChild(spec)
         return spec

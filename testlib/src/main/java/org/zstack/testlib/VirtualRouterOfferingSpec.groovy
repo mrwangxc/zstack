@@ -31,6 +31,8 @@ class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
     }
 
     private Closure l3Network(String name) {
+        addDependency(name, L3NetworkSpec.class)
+
         return {
             L3NetworkSpec l3 = findSpec(name, L3NetworkSpec.class)
             assert l3 != null: "cannot find the L3 network[$name] defined in VirtualRouterOfferingSpec"
@@ -47,6 +49,8 @@ class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
     }
 
     void useImage(String name) {
+        addDependency(name, ImageSpec.class)
+
         image = {
             ImageSpec i = findSpec(name, ImageSpec.class)
             assert i != null: "cannot find the image[$name] defined in VirtualRouterOfferingSpec"

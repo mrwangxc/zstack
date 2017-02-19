@@ -100,6 +100,13 @@ class Test1 extends Test {
                             types = ["DHCP", "DNS"]
                             session = sid
                         }
+
+                        ip {
+                            startIp = "192.168.100.10"
+                            endIp = "192.168.100.100"
+                            netmask = "255.255.255.0"
+                            gateway = "192.168.100.1"
+                        }
                     }
                 }
 
@@ -113,6 +120,13 @@ class Test1 extends Test {
                 }
 
                 attachBackupStorage("sftp")
+            }
+
+            vm {
+                name = "vm"
+                useInstanceOffering("instanceOffering")
+                useImage("image1")
+                useL3Networks("l3")
             }
         }.create()
     }

@@ -29,9 +29,9 @@ class ClusterSpec implements Spec {
 
     KVMHostSpec kvm(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = KVMHostSpec.class) Closure c) {
         def hspec = new KVMHostSpec()
-        def code = c.rehydrate(hspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = hspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(hspec)
         hosts.add(hspec)
         return hspec

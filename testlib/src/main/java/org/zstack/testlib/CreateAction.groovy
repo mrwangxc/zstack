@@ -12,4 +12,8 @@ trait CreateAction {
 
     List<Closure> preCreated = []
     List<Closure> postCreated = []
+
+    void postCreate(Closure cl) {
+        postCreated.add(cl)
+    }
 }
