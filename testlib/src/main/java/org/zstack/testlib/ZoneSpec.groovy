@@ -1,9 +1,10 @@
 package org.zstack.testlib
 
+import org.zstack.sdk.AttachBackupStorageToZoneAction
 import org.zstack.sdk.AttachL2NetworkToClusterAction
 import org.zstack.sdk.AttachPrimaryStorageToClusterAction
-import org.zstack.sdk.CreateZoneAction
 import org.zstack.sdk.ZoneInventory
+import org.zstack.utils.gson.JSONObjectUtil
 
 /**
  * Created by xing5 on 2017/2/12.
@@ -15,6 +16,8 @@ class ZoneSpec implements Spec {
     List<PrimaryStorageSpec> primaryStorage = []
     List<L2NetworkSpec> l2Networks = []
     List<VirtualRouterOfferingSpec> virtualRouterOfferingSpecs = []
+
+    private List<Closure> afterCreated = []
 
     ZoneInventory inventory
 
@@ -100,6 +103,22 @@ class ZoneSpec implements Spec {
         addChild(an)
     }
 
+    void attachBackupStorage(String...names) {
+        afterCreated.addAll(names.collect { String bsName ->
+            return { String sessionId ->
+                BackupStorageSpec bs = findSpec(bsName, BackupStorageSpec.class)
+                assert bs != null: "cannot find the backup storage[$bsName], unable to do attachBackupStorageToZone()"
+
+                def a = new AttachBackupStorageToZoneAction()
+                a.zoneUuid = inventory.uuid
+                a.backupStorageUuid = bs.inventory.uuid
+                a.sessionId = sessionId
+                def res = a.call()
+                assert res.error == null : "AttachBackupStorageToZoneAction failure: ${JSONObjectUtil.toJsonString(res.error)}"
+            }
+        })
+    }
+
     VirtualRouterOfferingSpec virtualRouterOffering(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = VirtualRouterOfferingSpec.class) Closure c) {
         def spec = new VirtualRouterOfferingSpec()
         def code = c.rehydrate(spec, this, this)
@@ -119,6 +138,8 @@ class ZoneSpec implements Spec {
             delegate.userTags = userTags
             delegate.systemTags = systemTags
         } as ZoneInventory
+
+        afterCreated.each { it(sessionId) }
 
         return id(name, inventory.uuid)
     }

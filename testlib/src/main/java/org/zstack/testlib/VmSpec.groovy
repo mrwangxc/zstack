@@ -6,18 +6,86 @@ import org.zstack.sdk.VmInstanceInventory
  * Created by xing5 on 2017/2/16.
  */
 class VmSpec implements Spec, HasSession {
-    Closure instanceOffering
-    Closure image
-    Closure rootDiskOffering
-    Closure cluster
-    Closure host
-    Closure diskOfferings
-    Closure l3Networks
-    Closure defaultL3Network
+    private Closure instanceOffering = {}
+    private Closure image = {}
+    private Closure rootDiskOffering = {}
+    private Closure cluster = {}
+    private Closure host = {}
+    private Closure diskOfferings = {}
+    private Closure l3Networks = {}
+    private Closure defaultL3Network = {}
     String name
     String description
 
     VmInstanceInventory inventory
+
+    void useInstanceOffering(String name) {
+        instanceOffering = {
+            InstanceOfferingSpec spec = findSpec(name, InstanceOfferingSpec.class)
+            assert spec != null: "cannot find instance offering[$name], check the vm block of environment"
+            return spec.inventory.uuid
+        }
+    }
+
+    void useImage(String name) {
+        image = {
+            ImageSpec spec = findSpec(name, ImageSpec.class)
+            assert spec != null: "cannot find image[$name], check the vm block of environment"
+            return spec.inventory.uuid
+        }
+    }
+
+    void useRootDiskOffering(String name) {
+        rootDiskOffering = {
+            DiskOfferingSpec spec = findSpec(name, DiskOfferingSpec.class)
+            assert spec != null: "cannot find useRootDiskOffering[$name], check the vm block of environment"
+            return spec.inventory.uuid
+        }
+    }
+
+    void useCluster(String name) {
+        cluster = {
+            ClusterSpec spec = findSpec(name, ClusterSpec.class)
+            assert spec != null: "cannot find cluster[$name], check the vm block of environment"
+            return spec.inventory.uuid
+        }
+    }
+
+    void useHost(String name) {
+        host = {
+            HostSpec spec = findSpec(name, HostSpec.class)
+            assert spec != null: "cannot find host[$name], check the vm block of environment"
+            return spec.inventory.uuid
+        }
+    }
+
+    void useDiskOfferings(String... names) {
+        diskOfferings = {
+            return names.collect { name ->
+                DiskOfferingSpec spec = findSpec(name, DiskOfferingSpec.class)
+                assert spec != null: "cannot find diskOffering[$name], check the vm block of environment"
+                return spec.inventory.uuid
+            }
+        }
+    }
+
+    void useL3Networks(String... names) {
+        l3Networks = {
+            return names.collect { name ->
+                L3NetworkSpec spec = findSpec(name, L3NetworkSpec.class)
+                assert spec != null: "cannot find l3Network[$name], check the vm block of environment"
+                return spec.inventory.uuid
+            }
+        }
+    }
+
+    void useDefaultL3Network(String name) {
+        defaultL3Network = {
+            L3NetworkSpec spec = findSpec(name, L3NetworkSpec.class)
+            assert spec != null: "cannot find defaultL3Network[$name], check the vm block of environment"
+            return spec.inventory.uuid
+        }
+    }
 
     SpecID create(String uuid, String sessionId) {
         inventory = createVmInstance {

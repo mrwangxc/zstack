@@ -69,22 +69,13 @@ class EnvSpec implements Node {
         return spec
     }
 
-    void attachBackupStorageToZone(String backupStorageName, String zoneName) {
-        BackupStorageSpec bs = find(backupStorageName, BackupStorageSpec.class)
-        assert bs != null: "cannot find the backup storage[$backupStorageName], unable to do attachBackupStorageToZone()"
-        ZoneSpec zone = find(zoneName, ZoneSpec.class)
-        assert zone != null: "cannot find the zone[$zoneName], unable tot do attachBackupStorageToZone()"
-
-        ActionNode an = {
-            def a = new AttachBackupStorageToZoneAction()
-            a.zoneUuid = zone.inventory.uuid
-            a.backupStorageUuid = bs.inventory.uuid
-            a.sessionId = session.uuid
-            def res = a.call()
-            assert res.error == null : "AttachBackupStorageToZoneAction failure: ${JSONObjectUtil.toJsonString(res.error)}"
-        }
-
-        addChild(an)
+    VmSpec vm(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = VmSpec.class) Closure c) {
+        def spec = new VmSpec()
+        def code = c.rehydrate(spec, this, this)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        addChild(spec)
+        return spec
     }
 
     void adminLogin() {

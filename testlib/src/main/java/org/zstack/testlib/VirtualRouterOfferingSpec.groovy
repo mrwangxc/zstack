@@ -6,7 +6,7 @@ package org.zstack.testlib
 class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
     Closure managementL3Network
     Closure publicL3Network
-    Closure image
+    private Closure image
     Closure zone
     Boolean isDefault
 
@@ -23,7 +23,7 @@ class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
             delegate.managementNetworkUuid = managementL3Network()
             delegate.publicNetworkUuid = publicL3Network()
             delegate.imageUuid = image()
-            delegate.zoneUuid = zone()
+            delegate.zoneUuid = (parent as ZoneSpec).inventory.uuid
             delegate.isDefault = isDefault
         }
 
@@ -38,8 +38,8 @@ class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
         }
     }
 
-    Closure image(String name) {
-        return {
+    void useImage(String name) {
+        image = {
             ImageSpec i = findSpec(name, ImageSpec.class)
             assert i != null: "cannot find the image[$name] defined in VirtualRouterOfferingSpec"
             return i.inventory.uuid
