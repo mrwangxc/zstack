@@ -34,9 +34,9 @@ class EnvSpec implements Node {
 
     AccountSpec account(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = AccountSpec.class) Closure c) {
         def aspec = new AccountSpec()
-        def code = c.rehydrate(aspec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = aspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         addChild(aspec)
         accounts.add(aspec)
         return aspec
@@ -101,12 +101,7 @@ class EnvSpec implements Node {
 
     EnvSpec create() {
         adminLogin()
-
-        children.each {
-            if (it instanceof Node) {
-                it.deploy()
-            }
-        }
+        deploy()
 
         return this
     }

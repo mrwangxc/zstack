@@ -12,9 +12,9 @@ class ClusterSpec implements Spec {
     String description
     String hypervisorType
     List<HostSpec> hosts = []
-    Map<String, PrimaryStorageSpec> primaryStorage = [:]
 
-    private List<Closure> postCreated = []
+    private List<String> primaryStorageToAttach = []
+    private List<String> l2NetworkToAttach = []
 
     ClusterInventory inventory
 
@@ -39,31 +39,21 @@ class ClusterSpec implements Spec {
 
     void attachPrimaryStorage(String... names) {
         names.each { String primaryStorageName ->
-            postCreated.add {
-                def ps = findSpec(primaryStorageName, PrimaryStorageSpec.class) as PrimaryStorageSpec
-                assert ps != null: "primary storage[$primaryStorageName] not found, check your environment()"
-
-                def a = new AttachPrimaryStorageToClusterAction()
-                a.clusterUuid = inventory.uuid
-                a.primaryStorageUuid = ps.inventory.uuid
-                a.sessionId = Test.deployer.envSpec.session.uuid
-                errorOut(a.call())
+            preCreated.add {
+                addDependency(primaryStorageName, PrimaryStorageSpec.class)
             }
+
+            primaryStorageToAttach.add(primaryStorageName)
         }
     }
 
     void attachL2Network(String ...names) {
         names.each { String l2NetworkName ->
-            postCreated.add {
-                def l2 = findSpec(l2NetworkName, L2NetworkSpec.class) as L2NetworkSpec
-                assert l2 != null: "l2 network[$l2NetworkName] not found, check your environment()"
-
-                def a = new AttachL2NetworkToClusterAction()
-                a.clusterUuid = inventory.uuid
-                a.l2NetworkUuid = l2.inventory.uuid
-                a.sessionId = Test.deployer.envSpec.session.uuid
-                errorOut(a.call())
+            preCreated.add {
+                addDependency(l2NetworkName, L2NetworkSpec.class)
             }
+
+            l2NetworkToAttach.add(l2NetworkName)
         }
     }
 
@@ -79,11 +69,24 @@ class ClusterSpec implements Spec {
             delegate.systemTags = systemTags
         } as ClusterInventory
 
-        return id(name, inventory.uuid)
-    }
+        primaryStorageToAttach.each { String primaryStorageName ->
+            def ps = findSpec(primaryStorageName, PrimaryStorageSpec.class) as PrimaryStorageSpec
+            def a = new AttachPrimaryStorageToClusterAction()
+            a.clusterUuid = inventory.uuid
+            a.primaryStorageUuid = ps.inventory.uuid
+            a.sessionId = Test.deployer.envSpec.session.uuid
+            errorOut(a.call())
+        }
 
-    @Override
-    void postCreate() {
-        postCreated.each { it() }
+        l2NetworkToAttach.each { String l2NetworkName ->
+            def l2 = findSpec(l2NetworkName, L2NetworkSpec.class) as L2NetworkSpec
+            def a = new AttachL2NetworkToClusterAction()
+            a.clusterUuid = inventory.uuid
+            a.l2NetworkUuid = l2.inventory.uuid
+            a.sessionId = Test.deployer.envSpec.session.uuid
+            errorOut(a.call())
+        }
+
+        return id(name, inventory.uuid)
     }
 }

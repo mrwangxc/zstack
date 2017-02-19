@@ -10,6 +10,6 @@ trait CreateAction {
         return new SpecID(name, uuid)
     }
 
-    void postCreate() {
-    }
+    List<Closure> preCreated = []
+    List<Closure> postCreated = []
 }

@@ -17,7 +17,7 @@ class ZoneSpec implements Spec {
     List<L2NetworkSpec> l2Networks = []
     List<VirtualRouterOfferingSpec> virtualRouterOfferingSpecs = []
 
-    private List<Closure> afterCreated = []
+    private List<String> backupStorageToAttach = []
 
     ZoneInventory inventory
 
@@ -104,19 +104,13 @@ class ZoneSpec implements Spec {
     }
 
     void attachBackupStorage(String...names) {
-        afterCreated.addAll(names.collect { String bsName ->
-            return {
-                BackupStorageSpec bs = findSpec(bsName, BackupStorageSpec.class)
-                assert bs != null: "cannot find the backup storage[$bsName], unable to do attachBackupStorageToZone()"
-
-                def a = new AttachBackupStorageToZoneAction()
-                a.zoneUuid = inventory.uuid
-                a.backupStorageUuid = bs.inventory.uuid
-                a.sessionId = Test.deployer.envSpec.session.uuid
-                def res = a.call()
-                assert res.error == null : "AttachBackupStorageToZoneAction failure: ${JSONObjectUtil.toJsonString(res.error)}"
+        names.each { String bsName ->
+            preCreated.add {
+                addDependency(bsName, BackupStorageSpec.class)
             }
-        })
+
+            backupStorageToAttach.add(bsName)
+        }
     }
 
     VirtualRouterOfferingSpec virtualRouterOffering(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = VirtualRouterOfferingSpec.class) Closure c) {
@@ -139,11 +133,16 @@ class ZoneSpec implements Spec {
             delegate.systemTags = systemTags
         } as ZoneInventory
 
-        return id(name, inventory.uuid)
-    }
+        backupStorageToAttach.each { String bsName ->
+            BackupStorageSpec bs = findSpec(bsName, BackupStorageSpec.class)
+            def a = new AttachBackupStorageToZoneAction()
+            a.zoneUuid = inventory.uuid
+            a.backupStorageUuid = bs.inventory.uuid
+            a.sessionId = Test.deployer.envSpec.session.uuid
+            def res = a.call()
+            assert res.error == null : "AttachBackupStorageToZoneAction failure: ${JSONObjectUtil.toJsonString(res.error)}"
+        }
 
-    @Override
-    void postCreate() {
-        afterCreated.each { it() }
+        return id(name, inventory.uuid)
     }
 }

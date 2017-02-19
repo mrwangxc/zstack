@@ -21,9 +21,9 @@ abstract class Test implements CreationSpec {
     private int phase = PHASE_NONE
 
     protected EnvSpec env(@DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=EnvSpec.class) Closure c) {
-        def code = c.rehydrate(deployer.envSpec, this, this)
-        code.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c.delegate = deployer.envSpec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
         return deployer.envSpec
     }
 
