@@ -10,10 +10,10 @@ trait CreateAction {
         return new SpecID(name, uuid)
     }
 
-    List<Closure> preCreated = []
-    List<Closure> postCreated = []
+    List<Closure> preOperations = []
+    List<Closure> postOperations = []
 
-    void postCreate(Closure cl) {
-        postCreated.add(cl)
+    void preCreate(Closure cl) {
+        preOperations.add(cl)
     }
 }

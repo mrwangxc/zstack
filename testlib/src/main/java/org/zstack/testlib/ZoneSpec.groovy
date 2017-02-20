@@ -71,7 +71,7 @@ class ZoneSpec implements Spec {
 
     void attachBackupStorage(String...names) {
         names.each { String bsName ->
-            preCreated.add {
+            preCreate {
                 addDependency(bsName, BackupStorageSpec.class)
             }
 

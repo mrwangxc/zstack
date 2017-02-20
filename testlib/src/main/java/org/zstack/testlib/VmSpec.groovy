@@ -20,7 +20,7 @@ class VmSpec implements Spec, HasSession {
     VmInstanceInventory inventory
 
     void useInstanceOffering(String name) {
-        postCreate {
+        preCreate {
             addDependency(name, InstanceOfferingSpec.class)
         }
 
@@ -32,7 +32,7 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useImage(String name) {
-        postCreate {
+        preCreate {
             addDependency(name, ImageSpec.class)
         }
 
@@ -44,7 +44,7 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useRootDiskOffering(String name) {
-        postCreate {
+        preCreate {
             addDependency(name, DiskOfferingSpec.class)
         }
 
@@ -56,7 +56,7 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useCluster(String name) {
-        postCreate {
+        preCreate {
             addDependency(name, ClusterSpec.class)
         }
 
@@ -68,7 +68,7 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useHost(String name) {
-        postCreate {
+        preCreate {
             addDependency(name, HostSpec.class)
         }
 
@@ -81,7 +81,7 @@ class VmSpec implements Spec, HasSession {
 
     void useDiskOfferings(String... names) {
         names.each { String name ->
-            postCreate {
+            preCreate {
                 addDependency(name, DiskOfferingSpec.class)
             }
         }
@@ -97,7 +97,7 @@ class VmSpec implements Spec, HasSession {
 
     void useL3Networks(String... names) {
         names.each { String name ->
-            postCreate {
+            preCreate {
                 addDependency(name, L3NetworkSpec.class)
             }
         }
@@ -112,7 +112,7 @@ class VmSpec implements Spec, HasSession {
     }
 
     void useDefaultL3Network(String name) {
-        postCreate {
+        preCreate {
             addDependency(name, L3NetworkSpec.class)
         }
 

@@ -39,7 +39,7 @@ class ClusterSpec implements Spec {
 
     void attachPrimaryStorage(String... names) {
         names.each { String primaryStorageName ->
-            preCreated.add {
+            preCreate {
                 addDependency(primaryStorageName, PrimaryStorageSpec.class)
             }
 
@@ -49,7 +49,7 @@ class ClusterSpec implements Spec {
 
     void attachL2Network(String ...names) {
         names.each { String l2NetworkName ->
-            preCreated.add {
+            preCreate {
                 addDependency(l2NetworkName, L2NetworkSpec.class)
             }
 

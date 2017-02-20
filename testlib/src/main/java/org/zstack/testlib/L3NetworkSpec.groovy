@@ -36,7 +36,7 @@ class L3NetworkSpec implements Spec, HasSession {
         c.delegate = spec
         c.resolveStrategy = Closure.DELEGATE_FIRST
         c()
-        addChild(c)
+        addChild(spec)
         return spec
     }
 }

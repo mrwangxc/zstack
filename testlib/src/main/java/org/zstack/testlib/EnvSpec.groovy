@@ -73,7 +73,7 @@ class EnvSpec implements Node {
         def spec = new VmSpec()
         c.delegate = spec
         c.resolveStrategy = Closure.DELEGATE_FIRST
-        code()
+        c()
         addChild(spec)
         return spec
     }

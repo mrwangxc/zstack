@@ -96,15 +96,15 @@ trait Node {
     }
 
     void deploy(String sessionId = null) {
-        sessionId = sessionId == null ? Test.deployer.envSpec.session?.uuid : sessionId
-        assert sessionId != null : "Not login yet!!! You need either call deploy() with a session uuid or call login() method" +
+        def sid = sessionId == null ? Test.deployer.envSpec.session?.uuid : sessionId
+        assert sid != null : "Not login yet!!! You need either call deploy() with a session uuid or call login() method" +
                 " in environment() of the test case"
 
         def allNodes = []
 
         walk {
             if (it instanceof CreateAction) {
-                it.preCreated.each { it() }
+                it.preOperations.each { it() }
             }
 
             allNodes.add(it)
@@ -119,7 +119,7 @@ trait Node {
             return sn.hasProperty("name") ? sn.name : sn.toString()
         }
 
-        System.out.println("xxxxxxxxxxxxxxxxxx deploying path: ${names.join(" --> ")} ")
+        System.out.println("deploying path: ${names.join(" --> ")} ")
 
         resolvedNodes.each {
             if (!(it instanceof CreateAction)) {
@@ -129,11 +129,7 @@ trait Node {
             def uuid = Platform.getUuid()
             Test.deployer.envSpec.specsByUuid[uuid] = it
 
-            if (it instanceof HasSession && it.session != null) {
-                sessionId = it.session()
-            }
-
-            SpecID id = (it as CreateAction).create(uuid, sessionId)
+            SpecID id = (it as CreateAction).create(uuid, (it instanceof HasSession && it.session != null) ? it.session() : sid as String)
             if (id != null) {
                 Test.deployer.envSpec.specsByName[id.name] = it
             }
@@ -141,7 +137,7 @@ trait Node {
 
         allNodes.each {
             if (it instanceof CreateAction) {
-                it.postCreated.each { it() }
+                it.postOperations.each { it() }
             }
         }
 

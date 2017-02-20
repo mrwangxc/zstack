@@ -31,7 +31,9 @@ class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
     }
 
     private Closure l3Network(String name) {
-        addDependency(name, L3NetworkSpec.class)
+        preCreate {
+            addDependency(name, L3NetworkSpec.class)
+        }
 
         return {
             L3NetworkSpec l3 = findSpec(name, L3NetworkSpec.class)
@@ -49,7 +51,9 @@ class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
     }
 
     void useImage(String name) {
-        addDependency(name, ImageSpec.class)
+        preCreate {
+            addDependency(name, ImageSpec.class)
+        }
 
         image = {
             ImageSpec i = findSpec(name, ImageSpec.class)
