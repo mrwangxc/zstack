@@ -193,7 +193,8 @@ public class RESTFacadeImpl implements RESTFacade {
         this.path = path;
     }
 
-    private void asyncJsonPost(String url, Object body, Map<String, String> headers, AsyncRESTCallback callback, TimeUnit unit, long timeout) {
+    @Override
+    public void asyncJsonPost(String url, Object body, Map<String, String> headers, AsyncRESTCallback callback, TimeUnit unit, long timeout) {
         for (BeforeAsyncJsonPostInterceptor ic : interceptors) {
             ic.beforeAsyncJsonPost(url, body, unit, timeout);
         }

@@ -279,7 +279,7 @@ public class KVMHost extends HostBase implements Host {
                     public Class<T> getReturnClass() {
                         return responseClass;
                     }
-                });
+                }, unit, timeout);
             }
         }
     }
