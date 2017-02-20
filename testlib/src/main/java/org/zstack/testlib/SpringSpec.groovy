@@ -56,6 +56,17 @@ class SpringSpec {
         include("eip.xml")
     }
 
+    void lb() {
+        include("vip.xml")
+        include("lb.xml")
+    }
+
+    void portForwarding() {
+        include("vip.xml")
+        include("PortForwarding.xml")
+    }
+
+
     void kvm() {
         include("Kvm.xml")
     }

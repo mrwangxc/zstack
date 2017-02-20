@@ -1,6 +1,7 @@
 import org.zstack.testlib.DiskOfferingSpec
 import org.zstack.testlib.EnvSpec
 import org.zstack.testlib.Test
+import org.zstack.testlib.premium.TestPremium
 import org.zstack.utils.data.SizeUnit
 
 /**
@@ -8,7 +9,7 @@ import org.zstack.utils.data.SizeUnit
  * 1. 2
  * 3
  */
-class Test1 extends Test {
+class Test1 extends TestPremium {
     boolean success
     DiskOfferingSpec diskOfferingSpec
     EnvSpec envSpec
@@ -21,6 +22,9 @@ class Test1 extends Test {
             vyos()
             eip()
             sftpBackupStorage()
+            portForwarding()
+            lb()
+            ipsec()
         }
     }
 
@@ -101,7 +105,7 @@ class Test1 extends Test {
 
                         service {
                             provider = "vrouter"
-                            types = ["DHCP", "DNS"]
+                            types = ["DHCP", "DNS", "Eip", "SNAT", "PortForwarding", "LoadBalancer", "IPsec"]
                         }
 
                         ip {
@@ -111,19 +115,69 @@ class Test1 extends Test {
                             gateway = "192.168.100.1"
                         }
                     }
+
+                    l3Network {
+                        name = "pubL3"
+                        useAccount("xin")
+
+                        ip {
+                            startIp = "12.16.10.10"
+                            endIp = "12.16.10.100"
+                            netmask = "255.255.255.0"
+                            gateway = "12.16.10.1"
+                        }
+                    }
                 }
 
                 virtualRouterOffering {
                     name = "vr"
                     memory = SizeUnit.MEGABYTE.toByte(512)
                     cpu = 2
-                    useManagementL3Network("l3")
-                    usePublicL3Network("l3")
+                    useManagementL3Network("pubL3")
+                    usePublicL3Network("pubL3")
                     useImage("vr")
                     useAccount("xin")
                 }
 
                 attachBackupStorage("sftp")
+
+                eip {
+                    name = "eip"
+                    useVip("pubL3")
+                    useVmNic("vm", "l3")
+                    useAccount("xin")
+                }
+
+                portForwarding {
+                    name = "pf"
+                    vipPortStart = 22
+                    privatePortStart = 22
+                    protocolType = "TCP"
+                    useVip("pubL3")
+                    useVmNic("vm", "l3")
+                    useAccount("xin")
+                }
+
+                lb {
+                    name = "lb"
+                    useVip("pubL3")
+                    useAccount("xin")
+
+                    listener {
+                        protocol = "tcp"
+                        loadBalancerPort = 22
+                        instancePort = 22
+                        useVmNic("vm", "l3")
+                    }
+                }
+
+                ipsec {
+                    name = "ipsec"
+                    peerAddress = "1.1.1.1"
+                    peerCidrs = ["10.10.0.0/24"]
+                    useVip("pubL3")
+                    useL3Network("l3")
+                }
             }
 
             vm {

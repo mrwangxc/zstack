@@ -207,7 +207,7 @@
         </dependency>
         <dependency>
             <groupId>org.zstack</groupId>
-            <artifactId>testlib</artifactId>
+            <artifactId>testlib-premium</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

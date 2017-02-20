@@ -1,29 +1,24 @@
 package org.zstack.testlib
 
-import org.zstack.sdk.EipInventory
-import org.zstack.sdk.L3NetworkInventory
+import org.zstack.sdk.LoadBalancerInventory
 import org.zstack.sdk.VipInventory
-import org.zstack.sdk.VmNicInventory
 
 /**
  * Created by xing5 on 2017/2/20.
  */
-class EipSpec implements Spec, HasSession {
+class LoadBalancerSpec implements Spec, HasSession {
     String name
     String description
-    String requiredIp
     private Closure vip
-    private Closure vmNic
 
-    EipInventory inventory
+    LoadBalancerInventory inventory
 
     SpecID create(String uuid, String sessionId) {
-        inventory = createEip {
+        inventory = createLoadBalancer {
             delegate.resourceUuid = uuid
             delegate.name = name
             delegate.description = description
             delegate.vipUuid = vip(sessionId)
-            delegate.vmNicUuid = vmNic == null ? null : vmNic()
             delegate.userTags = userTags
             delegate.systemTags = systemTags
             delegate.sessionId = sessionId
@@ -51,23 +46,12 @@ class EipSpec implements Spec, HasSession {
         }
     }
 
-    void useVmNic(String vmName, String l3NetworkName) {
-        assert vmName != null: "vmName must be set when calling eip.useVmNic()"
-        assert l3NetworkName != null: "l3NetworkName must be set when calling eip.useVmNic()"
-
-        preCreate {
-            addDependency(vmName, VmSpec.class)
-            addDependency(l3NetworkName, L3NetworkSpec.class)
-        }
-
-        vmNic = {
-            VmSpec vm = findSpec(vmName, VmSpec.class)
-            L3NetworkSpec l3 = findSpec(l3NetworkName, L3NetworkSpec.class)
-
-            VmNicInventory nic = vm.inventory.vmNics.find { it.l3NetworkUuid == l3.inventory.uuid }
-            assert nic!= null: "vm[$name] doesn't have nic on the l3 network[$l3NetworkName], check your environment()"
-
-            return nic.uuid
-        }
+    LoadBalancerListenerSpec listener(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = LoadBalancerListenerSpec.class) Closure c) {
+        def spec = new LoadBalancerListenerSpec()
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
+        addChild(spec)
+        return spec
     }
 }

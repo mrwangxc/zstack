@@ -10,7 +10,7 @@ import org.zstack.utils.gson.JSONObjectUtil
  * Created by xing5 on 2017/2/12.
  */
 class EnvSpec implements Node {
-    private List<ZoneSpec> zones = []
+    protected List<ZoneSpec> zones = []
     List<AccountSpec> accounts = []
 
     SessionInventory session

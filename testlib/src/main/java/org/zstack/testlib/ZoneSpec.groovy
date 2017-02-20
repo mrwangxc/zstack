@@ -1,8 +1,6 @@
 package org.zstack.testlib
 
 import org.zstack.sdk.AttachBackupStorageToZoneAction
-import org.zstack.sdk.AttachL2NetworkToClusterAction
-import org.zstack.sdk.AttachPrimaryStorageToClusterAction
 import org.zstack.sdk.ZoneInventory
 import org.zstack.utils.gson.JSONObjectUtil
 
@@ -86,6 +84,33 @@ class ZoneSpec implements Spec {
         c()
         addChild(spec)
         virtualRouterOfferingSpecs.add(spec)
+        return spec
+    }
+
+    EipSpec eip(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = EipSpec.class) Closure c) {
+        def spec = new EipSpec()
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
+        addChild(spec)
+        return spec
+    }
+
+    PortForwardingSpec portForwarding(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = PortForwardingSpec.class) Closure c) {
+        def spec = new PortForwardingSpec()
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
+        addChild(spec)
+        return spec
+    }
+
+    LoadBalancerSpec lb(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = LoadBalancerSpec.class) Closure cl) {
+        def spec = new LoadBalancerSpec()
+        cl.delegate = spec
+        cl.resolveStrategy = Closure.DELEGATE_FIRST
+        cl()
+        addChild(spec)
         return spec
     }
 

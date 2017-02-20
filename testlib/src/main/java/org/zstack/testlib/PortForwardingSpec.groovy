@@ -1,32 +1,42 @@
 package org.zstack.testlib
 
-import org.zstack.sdk.EipInventory
-import org.zstack.sdk.L3NetworkInventory
+import org.zstack.sdk.PortForwardingRuleInventory
 import org.zstack.sdk.VipInventory
 import org.zstack.sdk.VmNicInventory
 
 /**
  * Created by xing5 on 2017/2/20.
  */
-class EipSpec implements Spec, HasSession {
+class PortForwardingSpec implements Spec, HasSession {
     String name
     String description
-    String requiredIp
+    Integer vipPortStart
+    Integer vipPortEnd
+    Integer privatePortStart
+    Integer privatePortEnd
+    String allowedCidr
+    String protocolType
     private Closure vip
     private Closure vmNic
 
-    EipInventory inventory
+    PortForwardingRuleInventory inventory
 
     SpecID create(String uuid, String sessionId) {
-        inventory = createEip {
+        inventory = createPortForwardingRule {
             delegate.resourceUuid = uuid
             delegate.name = name
             delegate.description = description
+            delegate.vipPortStart = vipPortStart
+            delegate.vipPortEnd = vipPortEnd
+            delegate.privatePortStart = privatePortStart
+            delegate.privatePortEnd = privatePortEnd
+            delegate.protocolType = protocolType
+            delegate.allowedCidr = allowedCidr
             delegate.vipUuid = vip(sessionId)
-            delegate.vmNicUuid = vmNic == null ? null : vmNic()
+            delegate.sessionId = sessionId
             delegate.userTags = userTags
             delegate.systemTags = systemTags
-            delegate.sessionId = sessionId
+            delegate.vmNicUuid = vmNic == null ? null : vmNic()
         }
 
         return id(name, inventory.uuid)
@@ -52,8 +62,8 @@ class EipSpec implements Spec, HasSession {
     }
 
     void useVmNic(String vmName, String l3NetworkName) {
-        assert vmName != null: "vmName must be set when calling eip.useVmNic()"
-        assert l3NetworkName != null: "l3NetworkName must be set when calling eip.useVmNic()"
+        assert vmName != null: "vmName must be set when calling portForwarding.useVmNic()"
+        assert l3NetworkName != null: "l3NetworkName must be set when calling portForwarding.useVmNic()"
 
         preCreate {
             addDependency(vmName, VmSpec.class)
@@ -70,4 +80,5 @@ class EipSpec implements Spec, HasSession {
             return nic.uuid
         }
     }
+
 }
