@@ -74,4 +74,9 @@ class SpringSpec {
     void ceph() {
         include("ceph.xml")
     }
+
+    void smp() {
+        include("sharedMountPointPrimaryStorage.xml")
+    }
+
 }

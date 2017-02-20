@@ -47,7 +47,7 @@ class CephPrimaryStorageSpec extends PrimaryStorageSpec {
             String monAddr = Q.New(CephPrimaryStorageMonVO.class)
                     .select(CephPrimaryStorageMonVO_.monAddr).eq(CephPrimaryStorageMonVO_.uuid, cmd.monUuid).findValue()
 
-            rsp.monAddr = monAddrs[(monAddr)]
+            rsp.monAddr = cspec.monAddrs[(monAddr)]
 
             return rsp
         }
@@ -64,8 +64,8 @@ class CephPrimaryStorageSpec extends PrimaryStorageSpec {
             def rsp = new CephPrimaryStorageBase.InitRsp()
             rsp.fsid = cspec.fsid
             rsp.userKey = Platform.uuid
-            rsp.totalCapacity = totalCapacity
-            rsp.availableCapacity = availableCapacity
+            rsp.totalCapacity = cspec.totalCapacity
+            rsp.availableCapacity = cspec.availableCapacity
             return rsp
         }
 

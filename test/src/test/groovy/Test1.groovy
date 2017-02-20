@@ -26,6 +26,7 @@ class Test1 extends TestPremium {
             lb()
             ipsec()
             ceph()
+            smp()
         }
     }
 
@@ -99,7 +100,7 @@ class Test1 extends TestPremium {
                         totalCpu = 10
                     }
 
-                    attachPrimaryStorage("nfs", "ceph-pri")
+                    attachPrimaryStorage("nfs", "ceph-pri", "local", "smp")
                     attachL2Network("l2")
                 }
 
@@ -112,6 +113,16 @@ class Test1 extends TestPremium {
                     name = "ceph-pri"
                     fsid="7ff218d9-f525-435f-8a40-3618d1772a64"
                     monUrls = ["root:password@localhost/?monPort=7777", "root:password@127.0.0.1/?monPort=7777"]
+                }
+
+                localPrimaryStorage {
+                    name = "local"
+                    url = "/local_ps"
+                }
+
+                smpPrimaryStorage {
+                    name = "smp"
+                    url = "/smp"
                 }
 
                 l2NoVlanNetwork {

@@ -97,7 +97,7 @@ class CephBackupStorageSpec extends BackupStorageSpec {
         }
 
         Deployer.simulator(CephBackupStorageBase.DUMP_IMAGE_METADATA_TO_FILE) {
-            return CephBackupStorageBase.DumpImageInfoToMetaDataFileRsp()
+            return new CephBackupStorageBase.DumpImageInfoToMetaDataFileRsp()
         }
 
         Deployer.simulator(CephBackupStorageBase.GET_IMAGES_METADATA) {

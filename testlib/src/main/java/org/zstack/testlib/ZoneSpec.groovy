@@ -67,6 +67,16 @@ class ZoneSpec implements Spec {
         return nspec
     }
 
+    PrimaryStorageSpec smpPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SharedMountPointPrimaryStorageSpec.class) Closure c) {
+        def nspec = new SharedMountPointPrimaryStorageSpec()
+        c.delegate = nspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
+        addChild(nspec)
+        primaryStorage.add(nspec)
+        return nspec
+    }
+
     L2NetworkSpec l2NoVlanNetwork(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = L2NoVlanNetworkSpec.class) Closure c) {
         def lspec = new L2NoVlanNetworkSpec()
         c.delegate = lspec
