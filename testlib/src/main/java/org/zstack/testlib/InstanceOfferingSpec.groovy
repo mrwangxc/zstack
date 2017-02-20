@@ -23,6 +23,7 @@ class InstanceOfferingSpec implements Spec, HasSession {
             delegate.allocatorStrategy = allocatorStrategy
             delegate.userTags = userTags
             delegate.systemTags = systemTags
+            delegate.sessionId = sessionId
         }
 
         return id(name, inventory.uuid)

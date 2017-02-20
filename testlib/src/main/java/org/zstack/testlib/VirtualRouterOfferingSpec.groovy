@@ -10,6 +10,9 @@ class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
     Closure zone
     Boolean isDefault
 
+    // cause VirtualRouterSimulator to be loaded
+    private VirtualRouterSimulator simulator = new VirtualRouterSimulator()
+
     @Override
     SpecID create(String uuid, String sessionId) {
         inventory = createVirtualRouterOffering {

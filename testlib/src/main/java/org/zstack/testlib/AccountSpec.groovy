@@ -11,6 +11,7 @@ class AccountSpec implements Spec {
     String password
 
     AccountInventory inventory
+    SessionInventory session
 
     SpecID create(String uuid, String sessionId) {
         inventory = createAccount {
@@ -19,6 +20,11 @@ class AccountSpec implements Spec {
             delegate.name = name
             delegate.password = password
         }
+
+        session = logInByAccount {
+            delegate.accountName = name
+            delegate.password = password
+        } as SessionInventory
 
         return id(name, inventory.uuid)
     }

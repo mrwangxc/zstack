@@ -129,7 +129,29 @@ trait Node {
             def uuid = Platform.getUuid()
             Test.deployer.envSpec.specsByUuid[uuid] = it
 
-            SpecID id = (it as CreateAction).create(uuid, (it instanceof HasSession && it.session != null) ? it.session() : sid as String)
+            def suuid = sid
+            if (it instanceof HasSession) {
+                if (it.accountName != null) {
+                    AccountSpec aspec = Test.deployer.envSpec.find(it.accountName, AccountSpec.class)
+                    assert aspec != null: "cannot find the account[$it.accountName] defined in environment()"
+                    suuid = aspec.session.uuid
+                } else {
+                    def n = it.parent
+                    while (n != null) {
+                        if (!(n instanceof HasSession) || n.accountName == null) {
+                            n = n.parent
+                        } else {
+                            // one of the parent has the accountName set, use it
+                            AccountSpec aspec = Test.deployer.envSpec.find(n.accountName, AccountSpec.class)
+                            assert aspec != null: "cannot find the account[$n.accountName] defined in environment()"
+                            suuid = aspec.session.uuid
+                            break
+                        }
+                    }
+                }
+            }
+
+            SpecID id = (it as CreateAction).create(uuid, suuid)
             if (id != null) {
                 Test.deployer.envSpec.specsByName[id.name] = it
             }

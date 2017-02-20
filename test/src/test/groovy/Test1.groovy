@@ -27,20 +27,22 @@ class Test1 extends Test {
     @Override
     void environment() {
         envSpec = env {
-            def sid = account {
+            account {
                 name = "xin"
                 password = "password"
-            }.use()
+            }
 
             diskOffering {
                 name = "diskOffering"
                 diskSize = SizeUnit.GIGABYTE.toByte(10)
+                useAccount("xin")
             }
 
             instanceOffering {
                 name = "instanceOffering"
                 memory = SizeUnit.GIGABYTE.toByte(8)
                 cpu = 4
+                useAccount("xin")
             }
 
             sftpBackupStorage {
@@ -53,11 +55,13 @@ class Test1 extends Test {
                 image {
                     name = "image1"
                     url  = "http://zstack.org/download/test.qcow2"
+                    useAccount("xin")
                 }
 
                 image {
                     name = "vr"
                     url  = "http://zstack.org/download/vr.qcow2"
+                    useAccount("xin")
                 }
             }
 
@@ -93,12 +97,11 @@ class Test1 extends Test {
 
                     l3Network {
                         name = "l3"
-                        session = sid
+                        useAccount("xin")
 
                         service {
                             provider = "vrouter"
                             types = ["DHCP", "DNS"]
-                            session = sid
                         }
 
                         ip {
@@ -117,6 +120,7 @@ class Test1 extends Test {
                     useManagementL3Network("l3")
                     usePublicL3Network("l3")
                     useImage("vr")
+                    useAccount("xin")
                 }
 
                 attachBackupStorage("sftp")
@@ -127,6 +131,7 @@ class Test1 extends Test {
                 useInstanceOffering("instanceOffering")
                 useImage("image1")
                 useL3Networks("l3")
+                useAccount("xin")
             }
         }.create()
     }

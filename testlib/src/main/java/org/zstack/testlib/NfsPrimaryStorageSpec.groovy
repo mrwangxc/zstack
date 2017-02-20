@@ -141,5 +141,9 @@ class NfsPrimaryStorageSpec extends PrimaryStorageSpec {
             rsp.availableCapacity = spec.availableCapacity
             return rsp
         }
+
+        Deployer.simulator(NfsPrimaryToSftpBackupKVMBackend.CREATE_VOLUME_FROM_TEMPLATE_PATH) {
+            return new NfsPrimaryStorageKVMBackendCommands.CreateRootVolumeFromTemplateResponse()
+        }
     }
 }
