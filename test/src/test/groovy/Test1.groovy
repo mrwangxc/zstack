@@ -25,6 +25,7 @@ class Test1 extends TestPremium {
             portForwarding()
             lb()
             ipsec()
+            ceph()
         }
     }
 
@@ -69,6 +70,18 @@ class Test1 extends TestPremium {
                 }
             }
 
+            cephBackupStorage {
+                name = "ceph-bk"
+                fsid = "7ff218d9-f525-435f-8a40-3618d1772a64"
+                monUrls = ["root:password@localhost:23", "root:password@127.0.0.1:23"]
+
+                image {
+                    name = "image2"
+                    url  = "http://zstack.org/download/test.qcow2"
+                    useAccount("xin")
+                }
+            }
+
             zone {
                 name = "zone"
                 description = "test"
@@ -86,13 +99,19 @@ class Test1 extends TestPremium {
                         totalCpu = 10
                     }
 
-                    attachPrimaryStorage("nfs")
+                    attachPrimaryStorage("nfs", "ceph-pri")
                     attachL2Network("l2")
                 }
 
                 nfsPrimaryStorage {
                     name = "nfs"
                     url = "localhost:/nfs"
+                }
+
+                cephPrimaryStorage {
+                    name = "ceph-pri"
+                    fsid="7ff218d9-f525-435f-8a40-3618d1772a64"
+                    monUrls = ["root:password@localhost/?monPort=7777", "root:password@127.0.0.1/?monPort=7777"]
                 }
 
                 l2NoVlanNetwork {

@@ -70,4 +70,8 @@ class SpringSpec {
     void kvm() {
         include("Kvm.xml")
     }
+
+    void ceph() {
+        include("ceph.xml")
+    }
 }

@@ -15,7 +15,7 @@ class ZoneSpec implements Spec {
     List<L2NetworkSpec> l2Networks = []
     List<VirtualRouterOfferingSpec> virtualRouterOfferingSpecs = []
 
-    private List<String> backupStorageToAttach = []
+    protected List<String> backupStorageToAttach = []
 
     ZoneInventory inventory
 
@@ -37,8 +37,28 @@ class ZoneSpec implements Spec {
         return cspec
     }
 
-    PrimaryStorageSpec nfsPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = PrimaryStorageSpec.class) Closure c) {
+    PrimaryStorageSpec nfsPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = NfsPrimaryStorageSpec.class) Closure c) {
         def nspec = new NfsPrimaryStorageSpec()
+        c.delegate = nspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
+        addChild(nspec)
+        primaryStorage.add(nspec)
+        return nspec
+    }
+
+    PrimaryStorageSpec localPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = LocalStorageSpec.class) Closure c) {
+        def nspec = new NfsPrimaryStorageSpec()
+        c.delegate = nspec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
+        addChild(nspec)
+        primaryStorage.add(nspec)
+        return nspec
+    }
+
+    PrimaryStorageSpec cephPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = CephPrimaryStorageSpec.class) Closure c) {
+        def nspec = new CephPrimaryStorageSpec()
         c.delegate = nspec
         c.resolveStrategy = Closure.DELEGATE_FIRST
         c()

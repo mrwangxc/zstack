@@ -4,6 +4,7 @@ import org.zstack.header.identity.AccountConstant
 import org.zstack.sdk.AttachBackupStorageToZoneAction
 import org.zstack.sdk.LogInByAccountAction
 import org.zstack.sdk.SessionInventory
+import org.zstack.storage.ceph.backup.CephBackupStorageBase
 import org.zstack.utils.gson.JSONObjectUtil
 
 /**
@@ -53,6 +54,15 @@ class EnvSpec implements Node {
 
     BackupStorageSpec sftpBackupStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SftpBackupStorageSpec.class) Closure c) {
         def spec = new SftpBackupStorageSpec()
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c.delegate = spec
+        c()
+        addChild(spec)
+        return spec
+    }
+
+    BackupStorageSpec cephBackupStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = CephBackupStorageSpec.class) Closure c) {
+        def spec = new CephBackupStorageSpec()
         c.resolveStrategy = Closure.DELEGATE_FIRST
         c.delegate = spec
         c()
