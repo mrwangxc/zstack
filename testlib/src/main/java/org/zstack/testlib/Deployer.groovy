@@ -128,6 +128,7 @@ class Deployer {
 
             replyHttpCall(entity, rsp, ret)
         } catch (HttpError he) {
+            logger.warn("the simulator[$url] reports a http error[status code:${he.status}, message:${he.message}]", he)
             rsp.sendError(he.status, he.message)
         } catch (Throwable t) {
             logger.warn("error happened when handlign $url", t)

@@ -1,10 +1,12 @@
 import org.zstack.core.cloudbus.CloudBus
 import org.zstack.header.host.ConnectHostMsg
 import org.zstack.header.host.ConnectHostReply
+import org.zstack.kvm.KVMConstant
 import org.zstack.storage.primary.local.LocalStorageKvmBackend
 import org.zstack.testlib.Deployer
 import org.zstack.testlib.DiskOfferingSpec
 import org.zstack.testlib.EnvSpec
+import org.zstack.testlib.HttpError
 import org.zstack.testlib.LocalStorageSpec
 import org.zstack.testlib.premium.TestPremium
 import org.zstack.utils.data.SizeUnit
@@ -250,11 +252,9 @@ class Test3 extends TestPremium {
             }
         }
 
-        /*
         Deployer.simulator(KVMConstant.KVM_CONNECT_PATH) {
             throw new HttpError(403, "on purpose")
         }
-        */
 
         Deployer.afterSimulator(LocalStorageKvmBackend.INIT_PATH) { LocalStorageKvmBackend.AgentResponse rsp ->
             rsp.totalCapacity = SizeUnit.GIGABYTE.toByte(1)
