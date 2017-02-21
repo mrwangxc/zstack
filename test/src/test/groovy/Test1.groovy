@@ -27,6 +27,7 @@ class Test1 extends TestPremium {
             ipsec()
             ceph()
             smp()
+            securityGroup()
         }
     }
 
@@ -138,6 +139,11 @@ class Test1 extends TestPremium {
                             types = ["DHCP", "DNS", "Eip", "SNAT", "PortForwarding", "LoadBalancer", "IPsec"]
                         }
 
+                        service {
+                            provider = "SecurityGroup"
+                            types = ["SecurityGroup"]
+                        }
+
                         ip {
                             startIp = "192.168.100.10"
                             endIp = "192.168.100.100"
@@ -207,6 +213,21 @@ class Test1 extends TestPremium {
                     peerCidrs = ["10.10.0.0/24"]
                     useVip("pubL3")
                     useL3Network("l3")
+                }
+
+                securityGroup {
+                    name = "sg"
+                    useL3Network("l3")
+                    useAccount("xin")
+
+                    rule {
+                        type = "Ingress"
+                        startPort = 100
+                        endPort = 110
+                        protocol = "TCP"
+                    }
+
+                    useVmNic("vm", "l3")
                 }
             }
 

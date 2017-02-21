@@ -97,6 +97,15 @@ class ZoneSpec implements Spec {
         return lspec
     }
 
+    SecurityGroupSpec securityGroup(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = SecurityGroupSpec.class) Closure c) {
+        def spec = new SecurityGroupSpec()
+        c.delegate = spec
+        c.resolveStrategy = Closure.DELEGATE_FIRST
+        c()
+        addChild(spec)
+        return spec
+    }
+
     void attachBackupStorage(String...names) {
         names.each { String bsName ->
             preCreate {

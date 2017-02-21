@@ -79,4 +79,7 @@ class SpringSpec {
         include("sharedMountPointPrimaryStorage.xml")
     }
 
+    void securityGroup() {
+        include("SecurityGroupManager.xml")
+    }
 }

@@ -46,8 +46,10 @@ trait CreationSpec {
         assert res.error == null : "API failure: \${JSONObjectUtil.toJsonString(res.error)}"
         if (res.value.hasProperty("inventory")) {
             return res.value.inventory
-        } else {
+        } else if (res.value.hasProperty("inventories")) {
             return res.value.inventories
+        } else {
+            return res.value
         }
     }
     
