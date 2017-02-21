@@ -1,7 +1,12 @@
 package org.zstack.testlib
 
+import org.zstack.core.cloudbus.CloudBus
 import org.zstack.core.db.DatabaseFacade
+import org.zstack.header.AbstractService
 import org.zstack.header.exception.CloudRuntimeException
+import org.zstack.header.message.AbstractBeforeSendMessageInterceptor
+import org.zstack.header.message.Event
+import org.zstack.header.message.Message
 import org.zstack.utils.ShellUtils
 import org.zstack.utils.Utils
 import org.zstack.utils.logging.CLogger
@@ -48,6 +53,8 @@ abstract class Test implements CreationSpec {
     protected boolean INCLUDE_CORE_SERVICES = true
     protected boolean DOC = ""
 
+    protected Map<Class, Tuple> messageHandlers = [:]
+
     private void deployDB() {
         logger.info("Deploying database ...")
         String home = System.getProperty("user.dir")
@@ -86,8 +93,76 @@ abstract class Test implements CreationSpec {
         }
     }
 
+    protected void message(Class<? extends Message> msgClz, Closure condition, Closure handler) {
+        messageHandlers[(msgClz)] = new Tuple(condition, handler)
+    }
+
+    protected void message(Class<? extends Message> msgClz, Closure handler) {
+        message(msgClz, null, handler)
+    }
+
     private void nextPhase() {
         phase ++
+    }
+
+    private void hijackService() {
+        CloudBus bus = bean(CloudBus.class)
+
+        def serviceId = "test.hijack.service"
+        def service = new AbstractService() {
+            @Override
+            void handleMessage(Message msg) {
+                try {
+                    def entry = messageHandlers.find { k, _ -> k.isAssignableFrom(msg.getClass()) }
+                    if (entry != null) {
+                        Tuple t = entry.value
+                        Closure handler = t[1]
+                        if (handler.maximumNumberOfParameters <= 1) {
+                            handler(msg)
+                        } else {
+                            handler(msg, bus)
+                        }
+                    }
+                } catch (Exception ex) {
+                    bus.replyErrorByMessageType(msg, ex)
+                }
+            }
+
+            @Override
+            String getId() {
+                return bus.makeLocalServiceId(serviceId)
+            }
+
+            @Override
+            boolean start() {
+                return true
+            }
+
+            @Override
+            boolean stop() {
+                return true
+            }
+        }
+
+        bus.registerService(service)
+
+        messageHandlers.each { Class clz, Tuple t ->
+            if (!Event.isAssignableFrom(clz)) {
+                bus.installBeforeSendMessageInterceptor(new AbstractBeforeSendMessageInterceptor() {
+                    @Override
+                    void intercept(Message msg) {
+                        Closure condition = t[0]
+
+                        if (condition != null && !condition(msg)) {
+                            // the condition closure tells us not to hijack this message
+                            return
+                        }
+
+                        bus.makeLocalServiceId(msg, serviceId)
+                    }
+                }, clz)
+            }
+        }
     }
 
     private void prepare() {
@@ -115,6 +190,8 @@ abstract class Test implements CreationSpec {
         deployer.buildBeanConstructor(NEED_WEB_SERVER)
 
         nextPhase()
+
+        hijackService()
         environment()
     }
 
