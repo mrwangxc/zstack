@@ -28,6 +28,12 @@ class IpRangeSpec implements Spec, HasSession {
             delegate.l3NetworkUuid = (parent as L3NetworkSpec).inventory.uuid
         }
 
+        postCreate {
+            inventory = queryIpRange {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 }

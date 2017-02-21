@@ -1,5 +1,6 @@
 package org.zstack.testlib
 
+import org.zstack.core.db.DatabaseFacade
 import org.zstack.header.exception.CloudRuntimeException
 import org.zstack.utils.ShellUtils
 import org.zstack.utils.Utils
@@ -128,6 +129,11 @@ abstract class Test implements CreationSpec {
 
     protected <T> T specByUuid(String uuid) {
         return deployer.envSpec.specByUuid(uuid) as T
+    }
+
+    protected <T> T dbFindByUuid(String uuid, Class<T> voClz) {
+        DatabaseFacade dbf = bean(DatabaseFacade.class)
+        return dbf.findByUuid(uuid, voClz)
     }
 
     @org.junit.Test

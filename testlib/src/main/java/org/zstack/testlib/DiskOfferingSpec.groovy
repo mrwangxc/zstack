@@ -21,6 +21,12 @@ class DiskOfferingSpec implements Spec, HasSession {
             delegate.allocationStrategy = allocatorStrategy
         }
 
+        postCreate {
+            inventory = queryDiskOffering {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 }

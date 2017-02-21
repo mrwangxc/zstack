@@ -16,6 +16,12 @@ class L2NoVlanNetworkSpec extends L2NetworkSpec {
             delegate.zoneUuid = (parent as ZoneSpec).inventory.uuid
         }
 
+        postCreate {
+            inventory = queryL2Network {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 }

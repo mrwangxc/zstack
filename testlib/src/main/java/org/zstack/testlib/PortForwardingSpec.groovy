@@ -39,6 +39,12 @@ class PortForwardingSpec implements Spec, HasSession {
             delegate.vmNicUuid = vmNic == null ? null : vmNic()
         }
 
+        postCreate {
+            inventory = queryPortForwardingRule {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 

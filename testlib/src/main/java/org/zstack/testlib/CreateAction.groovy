@@ -16,4 +16,8 @@ trait CreateAction {
     void preCreate(Closure cl) {
         preOperations.add(cl)
     }
+
+    void postCreate(Closure cl) {
+        postOperations.add(cl)
+    }
 }

@@ -27,6 +27,12 @@ class SftpBackupStorageSpec extends BackupStorageSpec {
             delegate.systemTags = systemTags
         }
 
+        postCreate {
+            inventory = querySftpBackupStorage {
+                conditions = ["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 

@@ -34,6 +34,12 @@ class ImageSpec implements Spec, HasSession {
             delegate.backupStorageUuids = [(parent as BackupStorageSpec).inventory.uuid]
         }
 
+        postCreate {
+            inventory = queryImage {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 }

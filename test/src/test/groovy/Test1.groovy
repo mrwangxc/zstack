@@ -27,6 +27,7 @@ class Test1 extends TestPremium {
             ipsec()
             ceph()
             smp()
+            localStorage()
             securityGroup()
         }
     }

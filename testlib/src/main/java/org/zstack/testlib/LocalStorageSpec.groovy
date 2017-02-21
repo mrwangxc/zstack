@@ -24,6 +24,12 @@ class LocalStorageSpec extends PrimaryStorageSpec implements Spec {
             delegate.systemTags = systemTags
         } as PrimaryStorageInventory
 
+        postCreate {
+            inventory = queryPrimaryStorage {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 

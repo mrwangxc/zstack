@@ -26,6 +26,7 @@ class Deployer {
     SpringSpec springSpec = new SpringSpec()
 
     private static Map<String, Closure> httpHandlers = [:]
+    private static Map<String, Closure> httpPostHandlers = [:]
     private static RestTemplate restTemplate
     private BeanConstructor beanConstructor
     ComponentLoader componentLoader
@@ -51,10 +52,6 @@ class Deployer {
         componentLoader = beanConstructor.build()
     }
 
-    static List<String> getRegisteredUrlPath() {
-        return httpHandlers.keySet() as List<String>
-    }
-
     private static void replyHttpCall(HttpEntity<String> entity, HttpServletResponse response, Object rsp) {
         String taskUuid = entity.getHeaders().getFirst(RESTConstant.TASK_UUID)
         if (taskUuid == null) {
@@ -75,6 +72,10 @@ class Deployer {
 
     static void simulator(String path, Closure c) {
         httpHandlers[path] = c
+    }
+
+    static void afterSimulator(String path, Closure c) {
+        httpPostHandlers[path] = c
     }
 
     void handleSimulatorHttpRequests(HttpServletRequest req, HttpServletResponse rsp) {
@@ -114,7 +115,20 @@ class Deployer {
                 ret = handler(entity, envSpec)
             }
 
+            Closure postHandler = httpPostHandlers[url]
+            if (postHandler != null) {
+                if (postHandler.maximumNumberOfParameters <= 1) {
+                    ret = postHandler(ret)
+                } else if (handler.maximumNumberOfParameters == 2) {
+                    ret = postHandler(ret, entity)
+                } else {
+                    ret = postHandler(ret, entity, envSpec)
+                }
+            }
+
             replyHttpCall(entity, rsp, ret)
+        } catch (HttpError he) {
+            rsp.sendError(he.status, he.message)
         } catch (Throwable t) {
             logger.warn("error happened when handlign $url", t)
             rsp.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), t.message)

@@ -29,6 +29,12 @@ class EipSpec implements Spec, HasSession {
             delegate.sessionId = sessionId
         }
 
+        postCreate {
+            inventory = queryEip {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 

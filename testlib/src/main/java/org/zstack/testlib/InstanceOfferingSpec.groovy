@@ -26,6 +26,12 @@ class InstanceOfferingSpec implements Spec, HasSession {
             delegate.sessionId = sessionId
         }
 
+        postCreate {
+            inventory = queryInstanceOffering {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 }

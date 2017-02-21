@@ -139,6 +139,12 @@ class VmSpec implements Spec, HasSession {
             delegate.defaultL3NetworkUuid = defaultL3Network()
         }
 
+        postCreate {
+            inventory = queryVmInstance {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 }

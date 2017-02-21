@@ -41,6 +41,10 @@ class SpringSpec {
         include("NfsPrimaryStorage.xml")
     }
 
+    void localStorage() {
+        include("localStorage.xml")
+    }
+
     void vyos() {
         include("ApplianceVmFacade.xml")
         include("VirtualRouter.xml")

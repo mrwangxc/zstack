@@ -87,6 +87,12 @@ class ClusterSpec implements Spec {
             errorOut(a.call())
         }
 
+        postCreate {
+            inventory = queryCluster {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 }

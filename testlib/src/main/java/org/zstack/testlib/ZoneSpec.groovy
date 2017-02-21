@@ -48,7 +48,7 @@ class ZoneSpec implements Spec {
     }
 
     PrimaryStorageSpec localPrimaryStorage(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = LocalStorageSpec.class) Closure c) {
-        def nspec = new NfsPrimaryStorageSpec()
+        def nspec = new LocalStorageSpec()
         c.delegate = nspec
         c.resolveStrategy = Closure.DELEGATE_FIRST
         c()
@@ -171,6 +171,12 @@ class ZoneSpec implements Spec {
             a.sessionId = Test.deployer.envSpec.session.uuid
             def res = a.call()
             assert res.error == null : "AttachBackupStorageToZoneAction failure: ${JSONObjectUtil.toJsonString(res.error)}"
+        }
+
+        postCreate {
+            inventory = queryZone {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
         }
 
         return id(name, inventory.uuid)

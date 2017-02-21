@@ -26,6 +26,12 @@ class AccountSpec implements Spec {
             delegate.password = password
         } as SessionInventory
 
+        postCreate {
+            inventory = queryAccount {
+                conditions = ["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 

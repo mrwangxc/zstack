@@ -30,6 +30,12 @@ class VirtualRouterOfferingSpec extends InstanceOfferingSpec {
             delegate.isDefault = isDefault
         }
 
+        postCreate {
+            inventory = queryVirtualRouterOffering {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 

@@ -32,6 +32,12 @@ class CephPrimaryStorageSpec extends PrimaryStorageSpec {
             delegate.monUrls = monUrls
         } as PrimaryStorageInventory
 
+        postCreate {
+            inventory = queryCephPrimaryStorage {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 

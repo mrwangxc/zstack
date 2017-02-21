@@ -19,6 +19,12 @@ class L3NetworkSpec implements Spec, HasSession {
             delegate.l2NetworkUuid = (parent as L2NetworkSpec).inventory.uuid
         }
 
+        postCreate {
+            inventory = queryL3Network {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 

@@ -39,6 +39,12 @@ class KVMHostSpec extends HostSpec {
             delegate.sessionId = sessionId
         } as HostInventory
 
+        postCreate {
+            inventory = queryHost {
+                conditions=["uuid=${inventory.uuid}".toString()]
+            }[0]
+        }
+
         return id(name, inventory.uuid)
     }
 
