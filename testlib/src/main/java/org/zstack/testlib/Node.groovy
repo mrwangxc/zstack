@@ -8,11 +8,10 @@ import org.zstack.utils.logging.CLogger
  * Created by xing5 on 2017/2/12.
  */
 trait Node {
-    static final CLogger logger = Utils.getLogger(this.getClass())
+    final CLogger logger = Utils.getLogger(this.getClass())
 
     Node parent
     List<Object> children = []
-    List<Node> friends = []
     Set<Node> dependencies = []
 
     void accept(NodeVisitor v) {
@@ -26,11 +25,6 @@ trait Node {
         }
 
         children.add(child)
-    }
-
-    void addFriend(Node friend) {
-        friends.add(friend)
-        friend.friends.add(this)
     }
 
     void walkNode(Object n, Closure c) {
@@ -162,27 +156,5 @@ trait Node {
                 it.postOperations.each { it() }
             }
         }
-
-        /*
-        walk {
-            def uuid = Platform.getUuid()
-            Test.deployer.envSpec.specsByUuid[uuid] = it
-
-            if (it instanceof HasSession && it.session != null) {
-                sessionId = it.session()
-            }
-
-            SpecID id = (it as CreateAction).create(uuid, sessionId)
-            if (id != null) {
-                Test.deployer.envSpec.specsByName[id.name] = it
-            }
-        }
-
-        walk {
-            if (it instanceof CreateAction) {
-                it.postCreated.each { it() }
-            }
-        }
-        */
     }
 }

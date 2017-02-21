@@ -29,6 +29,7 @@ class Test1 extends TestPremium {
             smp()
             localStorage()
             securityGroup()
+            imageStore()
         }
     }
 
@@ -83,6 +84,14 @@ class Test1 extends TestPremium {
                     url  = "http://zstack.org/download/test.qcow2"
                     useAccount("xin")
                 }
+            }
+
+            imageStore {
+                name = "image-store"
+                url = "/image_store"
+                hostname = "127.0.0.1"
+                username = "root"
+                password = "password"
             }
 
             zone {
@@ -176,7 +185,7 @@ class Test1 extends TestPremium {
                     useAccount("xin")
                 }
 
-                attachBackupStorage("sftp")
+                attachBackupStorage("sftp", "image-store", "ceph-bk")
 
                 eip {
                     name = "eip"

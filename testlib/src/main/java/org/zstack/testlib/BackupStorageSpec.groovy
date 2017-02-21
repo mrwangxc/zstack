@@ -13,7 +13,7 @@ abstract class BackupStorageSpec implements Spec {
     Long totalCapacity = SizeUnit.GIGABYTE.toByte(1000)
     Long availableCapacity = SizeUnit.GIGABYTE.toByte(1000)
 
-    public BackupStorageInventory inventory
+    BackupStorageInventory inventory
 
     ImageSpec image(@DelegatesTo(strategy = Closure.DELEGATE_FIRST, value = ImageSpec.class) Closure c) {
         def i = new ImageSpec()
